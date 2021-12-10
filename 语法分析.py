@@ -636,12 +636,11 @@ def get_G(filename):
 
 
 def main():
+    token = 词法分析.lex('0.源代码.txt')
+
     filename = "2.表达式_完整程序.txt"
     G = get_G(filename)
-
     action, goto = get_SLR1_table(G)
-
-    token = 词法分析.process_2('0.源代码.txt')
 
     LR_analysis(G, action, goto, token)
 

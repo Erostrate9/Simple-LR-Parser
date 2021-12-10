@@ -1,79 +1,95 @@
+# 词法分析器的生成器较难控制细节，这里采用手工编码实现法
+# 通过词法规则的描述，画出相关的有穷状态自动机
+# 最后逐个字符读出预处理后的源代码
+
+# 分析基本语句(包括：函数定义，变量说明，赋值，循环，分支)
 # 处理，关键词、运算符、界符、数字、字符串、标识符、非法标识符
-def process_2(preprocess_filename):
+
+def lex(source_filename):
+
     # 关键词
     keywords = ['if', 'else', 'while', 'return', 'int', 'float', 'double', 'true', 'false']
 
     # 运算符
-    operator = ['+', '-', '*', '/',  # 算术运算符
-                '==', '!=', '>', '<', '>=', '<=',  # 关系运算符
-                '&&', '||', '!',  # 逻辑运算符
-                '='  # 赋值运算符
-                ]
-    # 界符
+    operators = [
+        # 算术运算符
+        '+', '-', '*', '/',
+        # 关系运算符
+        '==', '!=', '>', '<', '>=', '<=',
+        # 逻辑运算符
+        '&&', '||', '!',
+        # 赋值运算符
+        '='
+    ]
+    # 分界符
     delimiters = ['{', '}', '(', ')', ',', ';']
-
-    token = []
-
-    fp_read = open(preprocess_filename, 'r')
-
-    lines = fp_read.readlines()  # 按行读取
+    # 用tokens列表存储读到的单词
+    tokens = []
+    # 打开源文件
+    fp_read = open(source_filename, 'r')
+    # 按行读取文本文件
+    lines = fp_read.readlines()
+    # to save the number of lines
     length = len(lines)
-    i = 0
-    while i < length:
+    # 预处理:删去不影响语义的制表符/换行符/空格
+    for i in range(length):
+        # to delete redundant tab
         lines[i] = lines[i].replace('\t', ' ')
+        # to delete redundant LF
         lines[i] = lines[i].replace('\n', '')
+        # to delete redundant space
         lines[i] = lines[i].strip()
-        i += 1
-
-    # print(str(lines))
-
+    # 'row' stands for the index of lines
+    # 'i' stands for the index of characters for each line
     row = 0
     while row < len(lines):
+        # read the row th line of source_file
         line = lines[row]
         i = 0
 
         while i < len(line):
-            # print('line[i]=' + line[i])
-            # 当前字符为空格，跳过
+            # Space
+            # 当前字符为空格，跳过该字符
             if line[i] == ' ':
                 i += 1
                 continue
-            # 当前字符为单行注释，跳过
+
+            # Single-line Comments
+            # 当前字符为单行注释，跳过该行
             if line[i] == '/' and line[i + 1] == '/':
-                # print("line[i] == '/' and line[i + 1] == '/'")
-                # print('(%s, //, single-line annotation)' % (str(row)), file=fp_write)
                 break
-            # 当前字符为多行注释，跳过
+
+            # Multi-line Comments
+            # 当前字符为多行注释，记录注释行数并跳过这些行
             if line[i] == '/' and line[i + 1] == '*':
-                # print('(%s, /*, multi-line annotation)' % (str(row)), file=fp_write)
                 index = line.find('*/')
+                # if didn't find the end of comments, goto next line
                 while index == -1:
                     row += 1
                     line = lines[row]
                     index = line.find('*/')
-                # print('(%s, */, multi-line annotation)' % (str(row)), file=fp_write)
+                # if have found the end of the comments, continue to
+                # read the rest of characters
                 i = index + 2
                 continue
-            # 当前字符在界符集中
+
+            # Delimiters
+            # 当前字符在分界符集中
             if line[i] in delimiters:
-                # print('(%s, %s, delimiters)' % (str(row), line[i]), file=fp_write)
-
-                token.append([line[i], "界符"])
-
+                tokens.append([line[i], "分界符"])
                 i += 1
                 continue
+
             # 多符号运算符
-            if line[i] + line[i + 1] in operator:
+            if line[i] + line[i + 1] in operators:
                 temp = line[i] + line[i + 1]
                 i += 2
-                token.append([temp, "运算符"])
+                tokens.append([temp, "运算符"])
                 continue
 
             # 当前字符在运算符集中
-            if line[i] in operator:
-                # print('(%s, %s, operator)' % (str(row), temp), file=fp_write)
-
-                token.append([line[i], "运算符"])
+            if line[i] in operators:
+                tokens.append([line[i], "运算符"])
                 i += 1
                 continue
             # 当前字符为数字（包括整数和浮点数）
@@ -88,7 +104,7 @@ def process_2(preprocess_filename):
                         break
 
                 # 防止有以数字开头的标识符等非法
-                if line[i].isdigit() or line[i] in operator or line[i] in delimiters or line[i] == ' ':
+                if line[i].isdigit() or line[i] in operators or line[i] in delimiters or line[i] == ' ':
 
                     # 浮点数
                     if temp.find('.') != -1:
@@ -96,20 +112,20 @@ def process_2(preprocess_filename):
                         index = temp.find('.')
                         if temp[index:].find('.') > 0:
                             # print('(%s, %s, error)' % (str(row), temp), file=fp_write)
-                            token.append([temp, "错误"])
+                            tokens.append([temp, "错误"])
                         else:
                             # print('(%s, %s, float)' % (str(row), temp), file=fp_write)
 
-                            token.append([temp, "浮点数"])
+                            tokens.append([temp, "浮点数"])
 
                     else:
                         # print('(%s, %s, integer)' % (str(row), temp), file=fp_write)
 
-                        token.append([temp, "整数"])
+                        tokens.append([temp, "整数"])
 
                 else:
                     # print('(%s, %s, error)' % (str(row), temp), file=fp_write)
-                    token.append([temp, "错误"])
+                    tokens.append([temp, "错误"])
 
                 continue
             # 当前字符为字符串
@@ -135,13 +151,13 @@ def process_2(preprocess_filename):
                     # print('(%s, %s, string)' % (str(row), temp), file=fp_write)
                     # print('(%s, %s, delimiters)' % (str(row), line[i]), file=fp_write)
 
-                    token.append([temp, "字符串"])
-                    token.append([line[i], "界符"])
+                    tokens.append([temp, "字符串"])
+                    tokens.append([line[i], "界符"])
 
                 # 没找到另一端
                 else:
                     # print('(%s, %s, error)' % (str(row), temp), file=fp_write)
-                    token.append([temp, "错误"])
+                    tokens.append([temp, "错误"])
                 i += 1
                 continue
 
@@ -149,7 +165,7 @@ def process_2(preprocess_filename):
             # 先获取该关键词或标识符
             temp = ""
             while True:
-                if i > len(line) - 1 or line[i] == ' ' or line[i] in operator or line[i] in delimiters:
+                if i > len(line) - 1 or line[i] == ' ' or line[i] in operators or line[i] in delimiters:
                     break
                 else:
                     temp += line[i]
@@ -162,34 +178,35 @@ def process_2(preprocess_filename):
             if temp in keywords:
                 # print('(%s, %s, keywords)' % (str(row), temp), file=fp_write)
 
-                token.append([temp, "关键词"])
+                tokens.append([temp, "关键词"])
 
             # 当前字符可能是标识符（额外判断是否非法）
             else:
                 if not temp[0].isalpha():
                     # print('(%s, %s, error)' % (str(row), temp), file=fp_write)
-                    token.append([temp, "错误"])
+                    tokens.append([temp, "错误"])
                 else:
                     # print('(%s, %s, identifier)' % (str(row), temp), file=fp_write)
-                    token.append([temp, "标识符"])
+                    tokens.append([temp, "标识符"])
 
             i += 1
         row += 1
 
-    result_filename = '1.token序列.txt'
+    result_filename = '1.tokens序列.txt'
     write = open(result_filename, 'w', encoding='UTF-8')
-    for t in token:
+    for t in tokens:
         print('(%s, %s)' % (str(t[0]), str(t[1])), file=write)
-    print("已获取token序列，词法分析部分结束")
+    print("已获取tokens序列，词法分析部分结束")
 
-    return token
+    return tokens
 
 
 def main():
+    # 读入源代码文件作为字符流
     source_filename = '0.源代码.txt'
-    token = process_2(source_filename)
-    print(token)
-
+    # 获得对应单词序列并打印
+    tokens = lex(source_filename)
+    print(tokens)
 
 # if __name__ == '__main__':
 #     main()
