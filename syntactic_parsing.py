@@ -1,16 +1,21 @@
 import copy
 import lexical_analyzer
 
-
+# LR分析器实质上是一个带栈的确定有限自动机，其核心部分是一张分析表，包括两部分：
+# （1）ACTION[s，a]动作表，规定当状态s面临输入符号a时，应采取什么动作（移进、归约、接受、 报错）
+#       【也就是告诉我们当栈顶状态为s时，输入的符号是a时，我们应该采取什么操作：归约、移进还是报错】
+# （2）GOTO[s，X]状态转换表规定了状态s面对文法符号X时，下一状态是什么。
+#        【当归约完了后，要把规约后的非终结符压到栈里面的时候，跟新压入栈的这个非终结符所对应的状态是什么】
 # 产生式
-class Product:
+class Production:
     def __init__(self, left, right):
         self.left = left
         self.right = right
 
 
 # LR(0)项目，即带圆点的产生式
-# 三个变量分别表示产生式左部、右部和圆点坐标（在对应坐标字符的左侧）
+# 每个项目的含义是：欲用产生式归约时，圆点前面的部分为已经识别了的句柄部分，圆点后面的部分为期望的后缀部分。
+# left:产生式左部    right:右部    index:圆点坐标（在对应坐标字符的左侧）
 class Item:
     def __init__(self, left, right, index):
         self.left = left
@@ -46,22 +51,22 @@ def get_FIRST(G):
     # print("FIRST:" + str(FIRST))
 
     # 第一阶段处理
-    for product in G['P']:
-        X = product.left
-        if "ε" in product.right:
+    for production in G['P']:
+        X = production.left
+        if "ε" in production.right:
             FIRST[X].append("ε")
-        if product.right[0] in G['T']:
-            FIRST[X].append(product.right[0])
+        if production.right[0] in G['T']:
+            FIRST[X].append(production.right[0])
     # print("After 1, FIRST:" + str(FIRST))
 
     # 第二阶段处理，对于V中所有非终结符X，循环增加其FIRST集
     flag_change = True
     while flag_change:
         flag_change = False
-        for product in G['P']:
+        for production in G['P']:
             # print()
-            X = product.left
-            Y = product.right
+            X = production.left
+            Y = production.right
             # print("X = " + X + ", Y = " + str(Y))
             # if (X→Y…∈P and Y∈V) then FIRST(X):= FIRST(X)∪(FIRST(Y)-{ε})
             if Y[0] in G['V']:
@@ -188,10 +193,10 @@ def get_FOLLOW(G):
     flag_change = True
     while flag_change:
         flag_change = False
-        for product in G['P']:
+        for production in G['P']:
             # print()
-            A = product.left
-            Y = product.right
+            A = production.left
+            Y = production.right
             for i in range(0, len(Y)):
                 B = Y[i]
                 # 如果B不是非终结符，则继续循环直到找到非终结符
@@ -237,9 +242,9 @@ def get_closure(G, I):
         B = item.right[item.index]
         # print("B = " + str(B))
         if B in G['V']:
-            for product in G['P']:
-                if product.left == B:
-                    temp = Item(product.left, product.right, 0)
+            for production in G['P']:
+                if production.left == B:
+                    temp = Item(production.left, production.right, 0)
                     if not item_in_set(temp, J):
                         J.append(temp)
     return J
@@ -254,7 +259,7 @@ def item_in_set(item, set):
 
 
 # 项目集的转移函数（求出项目集I关于非终结符X的后继项目集）
-def GO(G, I, X):
+def GOTO(G, I, X):
     J = []
     for item in I:
         if item.index >= len(item.right):
@@ -278,7 +283,7 @@ def get_LR0_collection(G):
     # print("V or T:"+str(V_or_T))
     for I in C:
         for X in V_or_T:
-            J = GO(G, I, X)
+            J = GOTO(G, I, X)
             # 如果J不为空集
             if len(J) > 0:
                 # 判断J是否在C中
@@ -342,9 +347,9 @@ def get_LRO_table(G):
             # 圆点不在右部表达式的最右侧，即还不需要归约
             if item.index < len(item.right):
                 character = item.right[item.index]
-                # 找出满足GO(I, character)=C[j]的j
+                # 找出满足GOTO(I, character)=C[j]的j
                 for j in range(n):
-                    if set_equal(GO(G, I, character), C[j]):
+                    if set_equal(GOTO(G, I, character), C[j]):
                         # 如果character是终结符
                         if character in G['T']:
                             # 在action表里添加状态转移以及当前符号压入栈的提示
@@ -375,7 +380,7 @@ def get_SLR1_table(G):
     FOLLOW = get_FOLLOW(G)
 
     # 求G的拓广文法G'的LR0项目集
-    G['P'].insert(0, Product(G['S'] + "'", [G['S']]))
+    G['P'].insert(0, Production(G['S'] + "'", [G['S']]))
     G['V'].insert(0, G['S'] + "'")
     C = get_LR0_collection(G)
 
@@ -405,9 +410,9 @@ def get_SLR1_table(G):
             # 圆点不在右部表达式的最右侧，即还不需要归约
             if item.index < len(item.right):
                 character = item.right[item.index]
-                # 找出满足GO(I, character)=C[j]的j
+                # 找出满足GOTO(I, character)=C[j]的j
                 for j in range(n):
-                    if set_equal(GO(G, I, character), C[j]):
+                    if set_equal(GOTO(G, I, character), C[j]):
                         # 如果character是终结符
                         if character in G['T']:
                             # 在action表里添加状态转移以及当前符号压入栈的提示
@@ -476,9 +481,16 @@ class Node:
     def add_child(self, node):
         self.child.append(node)
 
+# 打印树的所有结点到文件
+def print_Node(node, write, h):
+    for i in range(h):
+        print("|\t", end="", file=write)
+    print(node.character, file=write)
+    for c in node.child:
+        print_Node(c, write, h+1)
 
 # 输入文法G、SLR(1)的action与goto分析表、词法分析得到的token串，输出LR分析结果以及对应的语法分析树至文件
-def LR_analyzer(G, action, goto, token):
+def LR_parser(G, action, goto, token):
     filename = '7_LR_parser_Analysis.txt'
     write = open(filename, 'w', encoding='UTF-8')
 
@@ -574,50 +586,63 @@ def LR_analyzer(G, action, goto, token):
         elif string == "acc":
             print("SLR(1)分析成功，语法分析部分结束")
             print("分析成功", file=write)
-            return
+
+            filename = '8_Parse_Tree.txt'
+            write = open(filename, 'w', encoding='UTF-8')
+            root = stack_node[0]
+            print_Node(stack_node[0], write, 0)
+            return root
 
 
-
-# 读取表达式，自动生成集合P，并且自动生成文法G
-# 表达式需要满足规则，出现在左侧的都是非终结符V，剩下的都是终结符T以及ε，开始符号S是第一条表达式的左部（全部用空格隔开）
+# 读取表达式，自动生成集合V,T,P,S; 并且自动生成文法G=(V, T, P, S)
+# V:非终结符,   T:终结符/ε,    P:产生式   S:开始符号
+# 输入的表达式必须满足:1.开始符号S是第一条表达式的左部 2.单词用空格隔开 3.出现在左侧的都是非终结符V (CFG)
 def get_G(filename):
+    # filename是表达式所在文件名,按行读入
     fp_read = open(filename, 'r', encoding='UTF-8')
     lines = fp_read.readlines()
 
+    # 生成的文法G写入文本文件
     result_filename = '3_CFG.txt'
     write = open(result_filename, 'w', encoding='UTF-8')
 
-    P = []
+    # V:非终结符,   T:终结符/ε,    P:产生式
     V = []
     T = []
-    # 记录出现过的所有字符
-    characters = []
+    P = []
 
+    # Production
     print("P : ", file=write)
     length = len(lines)
     for i in range(length):
+        # delete \n
         lines[i] = lines[i].replace('\n', '')
         if not lines[i]:
             continue
+        # remove comments which are sentences including with '#'
         if "#" in lines[i]:
             continue
+
         print(lines[i], file=write)
-        k = lines[i].index("->")
-        left = lines[i][0:k-1]
-        right = lines[i][k+3:]
+        p = lines[i].index("->")
+        # left part is a single word which is before '->'
+        left = lines[i][0:p-1]
+        # right part consists of multiple words split with space
+        right = lines[i][p+3:]
         right = right.split(" ")
-        # print("left:" + left)
-        # print("right:" + str(right))
-        P.append(Product(left, right))
+
+        P.append(Production(left, right))
+
+        # V consists of every left part of P
         if left not in V:
             V.append(left)
-
+    # T consists of words in right parts which are not in V or T
     for i in range(len(P)):
         right = P[i].right
         for c in right:
-            if c not in V and c not in T and c != 'ε':
+            if (c not in V) and (c not in T) and (c != 'ε'):
                 T.append(c)
-
+    # S is the first Production's left part
     S = P[0].left
 
     print("", file=write)
@@ -636,18 +661,19 @@ def get_G(filename):
 
 
 def main():
+    source_code_name='0_source_code.txt'
     # invoke lexer to get the sequence of tokens
-    tokens = lexical_analyzer.lex('0_source_code.txt')
+    tokens = lexical_analyzer.lex(source_code_name)
 
     # to get the grammar G.
-    filename = "2_Product.txt"
-    G = get_G(filename)
+    product_filename = "2_Product.txt"
+    G = get_G(product_filename)
 
     # to get the SLR(1) parsing table
     action, goto = get_SLR1_table(G)
 
     # using simple LR parser with  G and SLR(1) parsing tables to analyze tokens
-    LR_analyzer(G, action, goto, tokens)
+    LR_parser(G, action, goto, tokens)
 
 
 if __name__ == '__main__':
