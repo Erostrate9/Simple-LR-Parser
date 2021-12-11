@@ -4,7 +4,7 @@ import lexical_analyzer
 # LR分析器实质上是一个带栈的确定有限自动机，其核心部分是一张分析表，包括两部分：
 # （1）ACTION[s，a]动作表，规定当状态s面临输入符号a时，应采取什么动作（移进、归约、接受、 报错）
 #       【也就是告诉我们当栈顶状态为s时，输入的符号是a时，我们应该采取什么操作：归约、移进还是报错】
-# （2）GOTO[s，X]状态转换表规定了状态s面对文法符号X时，下一状态是什么。
+# （2）GO[s，X]状态转换表规定了状态s面对文法符号X时，下一状态是什么。
 #        【当归约完了后，要把规约后的非终结符压到栈里面的时候，跟新压入栈的这个非终结符所对应的状态是什么】
 # 产生式
 class Production:
@@ -22,208 +22,215 @@ class Item:
         self.right = right
         self.index = index
 
+# 语法分析树的结点
+class Node:
+    def __init__(self, character, token=None):
+        self.child = []
+        self.character = character
+        self.token = token
 
-# 以标准格式打印LR(0)项目集
-def print_item(I):
-    for item in I:
-        right = ""
-        for i in range(0, len(item.right)):
-            if i == item.index:
-                right += "."
-            right += item.right[i] + " "
-        if item.index >= len(item.right):
-            right += "."
-        print(str(item.left) + " -> " + right)
+    def add_child(self, node):
+        self.child.append(node)
 
+
+# finished
+# 打印树的所有结点到文件
+def print_Node(node, write, h):
+    for i in range(h):
+        print("|\t", end="", file=write)
+    print(node.character, file=write)
+    for c in node.child:
+        print_Node(c, write, h+1)
+
+
+
+# finished
+# 求两个FIRST或FOLLOW集X，Y的并集
+# 若该并集比X大，则返回True，否则返回False
+# 求FIRST集需要用到参数except_epsilon，指示是否需要去除{ε}
+# F stands for the FIRST or FOLLOW set
+# X and Y are both in (V U T)
+def union_set(F, X, Y, flag_remove_epsilon):
+    set_X = set(F[X])
+    if Y == "ε":
+        set_Y = set("ε")
+    else:
+        set_Y = set(F[Y])
+    if flag_remove_epsilon:
+        set_Y.discard("ε")
+    size_origin = len(F[X])
+    F[X] = list(set_X.union(set_Y))
+    size_result = len(F[X])
+    if size_result > size_origin:
+        return True
+    else:
+        return False
+
+
+# 求G的所有FIRST(s)，s∈(V U T)*，s = X1X2X3...Xn
+# 如果之前没有记录过对应的FIRST(s)，就将其添加到FIRST集中
+def get_FIRST_s(FIRST, s):
+    # 如果s是单个非终结符或者终结符，则FIRST集中已经存在，直接返回即可
+    if len(s) == 1:
+        # α=ε的特殊情况，特殊处理
+        if "ε" in s:
+            FIRST["ε"] = ["ε"]
+        return FIRST[s[0]]
+    # 如果s是多个非终结符或终结符的集合，就开始运行算法求解FIRST(s)
+    string_s = ""
+    for X in s:
+        string_s = string_s + X + " "
+    string_s = string_s.strip()
+    FIRST[string_s] = []
+
+    flag_epsilon = False
+    for X in s:
+        flag_epsilon = False
+        if "ε" in FIRST[X]:
+            flag_epsilon = True
+            union_set(FIRST, string_s, X, True)
+        if not flag_epsilon:
+            union_set(FIRST, string_s, X, True)
+            break
+    # 如果X1-Xn都能推出ε，就把ε也添加到FIRST中
+    if flag_epsilon:
+        union_set(FIRST, string_s, "ε", False)
+    return FIRST[string_s]
+
+#finished
+# 对于文法G的任一符号串α=X1X2…Xn可按下列步骤构造其FIRST(α)集合：
+# 1) 置FIRST(α)=φ
+# 2) 将FIRST(X1)中的一切非ε符号加进FIRST(α)；
+# 3) 若ε∈FIRST(X1)，将FIRST(X2)中的一切非ε符号加进FIRST(α)；
+#    若ε∈FIRST(X1)和FIRST(X2)，将FIRST(X3)中的一切非ε符号加进FIRST(α)；依次类推。
+#       //若该符号能推出ε则将下一个符号的FIRST集加入FIRST(α)，以此类推。
+# 4)若对于一切1≤i≤n,ε∈FIRST(Xi)，则将ε符号加进FIRST(α)。
+#       //若右侧符号串的每个符号都能推出ε，则α肯定能推出ε，所以将ε加进FIRST（α）。
 
 # 求G的所有FIRST(X)，X∈(V U T)
 def get_FIRST(G):
-    # 初始化
+    # 用字典存储FIRST集，相当于一个Hash Table，提高查询效率，同时方便输出展示
     FIRST = {}
+
     # 去掉S'
     temp_V = set(G['V'])
     temp_V.discard(G['S'] + "'")
 
     for X in temp_V:
         FIRST[X] = []
+
+    # for t, FIRST[t]=t
     for X in G['T']:
         FIRST[X] = [X]
-    # print("FIRST:" + str(FIRST))
 
-    # 第一阶段处理
+    # step 1: if X -> t or X -> ε, append it to FIRST[X]
     for production in G['P']:
         X = production.left
-        if "ε" in production.right:
+        if ("ε" in production.right) and ("ε" not in FIRST[X]):
             FIRST[X].append("ε")
         if production.right[0] in G['T']:
             FIRST[X].append(production.right[0])
-    # print("After 1, FIRST:" + str(FIRST))
 
-    # 第二阶段处理，对于V中所有非终结符X，循环增加其FIRST集
-    flag_change = True
-    while flag_change:
-        flag_change = False
+    # step 2: 对于右部所有非终结符Y，循环增加其FIRST集
+    flag_set_change = True
+    while flag_set_change:
+        flag_set_change = False
         for production in G['P']:
-            # print()
             X = production.left
             Y = production.right
-            # print("X = " + X + ", Y = " + str(Y))
-            # if (X→Y…∈P and Y∈V) then FIRST(X):= FIRST(X)∪(FIRST(Y)-{ε})
+            # if (X->Y...∈P and Y∈V) then FIRST(X) ∪= (FIRST(Y)-{ε})
             if Y[0] in G['V']:
-                # print(Y[0] + " in V : {")
-                if union_FIRST_or_FOLLOW(FIRST, X, Y[0], True):
-                    flag_change = True
-                # print("}")
-                # print("after FIRST[X} = " + str(FIRST[X]))
+                flag_set_change = union_set(FIRST, X, Y[0], flag_remove_epsilon=True)
 
-            # if (X→Y1…Yn∈P and Y1...Yi-1→ε) then for k=2 to i do FIRST(X):= FIRST(X)∪(FIRST(Yk)-{ε})
+            # if (X->Y_1...Y_n∈P and Y_1...Y_{i-1}->ε) then for k=2 to i do (FIRST(X) ∪= (FIRST(Y_k)-{ε}))
             if len(Y) == 1:
                 continue
             # 产生式右部全部都是非终结符
             else:
-                # print(str(Y) + " all in V : {")
                 flag_epsilon = False
-                # 把右部的非终结符里能推导出ε的FIRST集去掉ε之后添加到FIRST(X)中
+                # 把Y的非终结符里能推导出ε的FIRST集去掉ε
+                # 添加到FIRST(X)中
                 for y in Y:
-                    # print("y = " + y)
                     flag_epsilon = False
-
                     if "ε" in FIRST[y]:
-                        # print(y + " → ε")
                         flag_epsilon = True
-                        if union_FIRST_or_FOLLOW(FIRST, X, y, True):
-                            flag_change = True
-                        # print("after FIRST[X} = " + str(FIRST[X]))
-                    # 如果当前这个非终结符推不出ε，若之后还有终结符，就再来最后一次，否则就停止循环
+                        flag_set_change = union_set(FIRST, X, Y[0], flag_remove_epsilon=True)
+
+                    # 如果当前这个非终结符推不出ε
                     if not flag_epsilon:
-                        # print(y + " can't → ε")
-                        if union_FIRST_or_FOLLOW(FIRST, X, y, True):
-                            flag_change = True
-                        # print("after FIRST[X} = " + str(FIRST[X]))
+                        # 若之后还有终结符，就再来最后一次，否则停止循环
+                        flag_set_change = union_set(FIRST, X, Y[0], flag_remove_epsilon=True)
                         break
 
-                # 如果右部每一个非终结符都能推出ε，就给FIRST(X)加上ε
+                # 如果右部每一个非终结符都能推出ε，FIRST(X)可以包含ε
                 if flag_epsilon:
-                    # print(str(Y) + " all → ε")
-                    if union_FIRST_or_FOLLOW(FIRST, X, "ε", False):
-                        flag_change = True
-
-                # print("}")
-
+                    if union_set(FIRST, X, "ε", False):
+                        flag_set_change = True
     return FIRST
 
-
-# 求两个FIRST或FOLLOW的并集，并返回该并集是否比原本的左侧集合更大，参数except_epsilon指示是否需要减去{ε}，求FIRST集需要用到
-def union_FIRST_or_FOLLOW(F, X, Y, except_epsilon):
-    set_X = set(F[X])
-    if Y == "ε":
-        set_Y = set("ε")
-    else:
-        set_Y = set(F[Y])
-    # print("%s" % (str(set_X)) + " + ", end='')
-    # print("%s" % (str(set_Y)), end="")
-    if except_epsilon:
-        set_Y.discard("ε")
-        # print(" -  {ε} ", end="")
-    before = len(F[X])
-    F[X] = list(set_X.union(set_Y))
-    # print("= %s" % (str(F[X])))
-    after = len(F[X])
-    if before < after:
-        return True
-    else:
-        return False
-
-
-# 求G的所有FIRST(a)，a∈(V U T)*，a = X1X2X3...Xn
-# 如果之前没有记录过对应的FIRST(a)，就将其添加到FIRST集中
-def get_FIRST_alpha(FIRST, a):
-    # 如果a是单个非终结符或者终结符，则FIRST集中已经存在，直接返回即可
-    if len(a) == 1:
-        # α=ε的特殊情况，特殊处理
-        if "ε" in a:
-            FIRST["ε"] = ["ε"]
-        return FIRST[a[0]]
-    # 如果a是多个非终结符或终结符的集合，就开始运行算法求解FIRST(a)
-    string_a = ""
-    for X in a:
-        string_a = string_a + X + " "
-    string_a = string_a.strip()
-    FIRST[string_a] = []
-
-    flag_epsilon = False
-    for X in a:
-        flag_epsilon = False
-        if "ε" in FIRST[X]:
-            flag_epsilon = True
-            union_FIRST_or_FOLLOW(FIRST, string_a, X, True)
-        if not flag_epsilon:
-            union_FIRST_or_FOLLOW(FIRST, string_a, X, True)
-            break
-    # 如果X1-Xn都能推出ε，就把ε也添加到FIRST中
-    if flag_epsilon:
-        union_FIRST_or_FOLLOW(FIRST, string_a, "ε", False)
-    return FIRST[string_a]
-
-
-# 求G的所有FOLLOW(X)
+#finished
+# 1. 对于文法的开始符号S，置#于FOLLOW(S) 中;
+# 2. 若Ａ→αBβ是一个产生式,则把(FIRST(β)-{ε})加至FOLLOW(B)中;
+#    若β=>*ε (即ε in FIRST(β))，则把FOLLOW(A)加至FOLLOW(B)中。
+#       //若B有可能是最后一个符号，则把FOLLOW(A)加至FOLLOW(B)中，否则把(FIRST(β)- {ε})加至FOLLOW(B)中。
+# 反复使用上述规则，直到所求FOLLOW集不再增大为止。
+# 注意: 在FOLLOW集合中无ε。
+# 求G的所有FOLLOW(X)，X∈(V U T)
 def get_FOLLOW(G):
     filename = '5_FIRST_and_FOLLOW.txt'
     write = open(filename, 'w', encoding='UTF-8')
-    # 获取FIRST集，并输出到文件
-    FIRST = get_FIRST(G)
 
+    # 先获取FIRST集，并输出到文本文件
+    FIRST = get_FIRST(G)
     print("FIRST:", file=write)
     keys = FIRST.keys()
     for k in keys:
         print(str(k) + ": " + str(FIRST[k]), file=write)
 
-
-
     # 初始化
+    # 用字典存储FOLLOW集
     FOLLOW = {}
     # 去掉S'
     temp_V = set(G['V'])
     temp_V.discard(G['S'] + "'")
     for X in temp_V:
         FOLLOW[X] = []
-    FOLLOW[G['S']].append("#")
+    # 最后一步归约我们希望S后跟着$
+    FOLLOW[G['S']].append("$")
 
-    # 第二阶段处理，A→αBβ
-    flag_change = True
-    while flag_change:
-        flag_change = False
+    # A -> αBβ
+    flag_set_change = True
+    while flag_set_change:
+        flag_set_change = False
         for production in G['P']:
-            # print()
             A = production.left
             Y = production.right
             for i in range(0, len(Y)):
                 B = Y[i]
-                # 如果B不是非终结符，则继续循环直到找到非终结符
+                # 如果B不是非终结符，则跳过直到找到非终结符
                 if B not in G['V']:
                     continue
                 # 判断B后面是否还有β
                 if i == len(Y) - 1:
-                    flag_change = union_FIRST_or_FOLLOW(FOLLOW, B, A, False)
+                    flag_set_change = union_set(FOLLOW, B, A, False)
                 else:
                     beta = Y[i+1:]
-                    FIRST_beta = get_FIRST_alpha(FIRST, beta)
+                    FIRST_beta = get_FIRST_s(FIRST, beta)
+                    # 若β=>*ε (即ε∈FIRST(β))，则把FOLLOW(A)加至FOLLOW(B)中。
+                    #       //若B有可能是最后一个符号，则把FOLLOW(A)加至FOLLOW(B)中，否则把(FIRST(β)- {ε})加至FOLLOW(B)中。
+                    # 反复使用上述规则，直到所求FOLLOW集不再增大为止。
                     # 如果ε∈FIRST(β)
                     if "ε" in FIRST_beta:
-                        flag_change = union_FIRST_or_FOLLOW(FOLLOW, B, A, False)
+                        flag_set_change = union_set(FOLLOW, B, A, False)
 
                     set_B = set(FOLLOW[B])
                     set_beta = set(FIRST_beta)
-                    # print("%s" % (str(set_B)) + " + ", end='')
-                    # print("%s" % (str(set_beta)), end="")
                     set_beta.discard("ε")
-                    # print(" -  {ε} ", end="")
-                    before = len(FOLLOW[B])
+                    size_og = len(FOLLOW[B])
                     FOLLOW[B] = list(set_B.union(set_beta))
-                    # print("= %s" % (str(FOLLOW[B])))
-                    after = len(FOLLOW[B])
-                    if before < after:
-                        flag_change = True
+                    size_res = len(FOLLOW[B])
+                    if size_og < size_res:
+                        flag_set_change = True
     # 输出FOLLOW至文件
     print("\nFOLLOW:", file=write)
     keys = FOLLOW.keys()
@@ -232,7 +239,9 @@ def get_FOLLOW(G):
 
     return FOLLOW
 
-
+#CLOSURE(I)是这样定义的：
+#   首先I的项目都属于CLOSURE(I)；
+#   如果A->α• Bβ,则左部为B的每个产生式中的形如B->·γ项目，也属于CLOSURE(I)；
 # 求I的闭包
 def get_closure(G, I):
     J = copy.copy(I)
@@ -240,7 +249,6 @@ def get_closure(G, I):
         if item.index >= len(item.right):
             continue
         B = item.right[item.index]
-        # print("B = " + str(B))
         if B in G['V']:
             for production in G['P']:
                 if production.left == B:
@@ -258,32 +266,40 @@ def item_in_set(item, set):
     return False
 
 
-# 项目集的转移函数（求出项目集I关于非终结符X的后继项目集）
-def GOTO(G, I, X):
+# 项目集的转移函数
+# 求出项目集I关于非终结符X的后继项目集
+# GO(G,I，X)＝CLOSURE(J)
+# 其中：I为包含某一项目的状态。X为一文法符号，X∈(V ∪ T)，
+# J＝{任何形如 A→αX·β 的项目| A→α·Xβ属于I}
+def GO(G, I, X):
     J = []
     for item in I:
+        # 圆点到末尾，换下一个项目
         if item.index >= len(item.right):
             continue
         B = item.right[item.index]
         if B == X:
-            if B in G['V'] or B in G['T']:
+            if X in G['V'] or X in G['T']:
                 J.append(Item(item.left, item.right, item.index + 1))
-    # print("J : ")
-    # print_item(J)
     return get_closure(G, J)
 
-
+# 每个项目集对应一个DFA状态，它们的全体称为这个文法的项目集规范族
+# 用闭包函数（CLOSURE）来求DFA一个状态的项目集
+# I是拓广文法G的任意项目集：
+# CLOSURE(I)是这样定义的：
+#   首先I的项目都属于CLOSURE(I)；
+#   如果A->α• Bβ,则左部为B的每个产生式中的形如B->·γ项目，也属于CLOSURE(I)；也就是找到对应确定状态自动机的所有边
 # 输入文法G'，计算LR(0)项目集规范族C
 def get_LR0_collection(G):
     C = []
     I = []
     I.append(Item(G['P'][0].left, G['P'][0].right, 0))
     C.append(get_closure(G, I))
+    # everything in V or in T
     V_or_T = G['V'] + G['T']
-    # print("V or T:"+str(V_or_T))
     for I in C:
         for X in V_or_T:
-            J = GOTO(G, I, X)
+            J = GO(G, I, X)
             # 如果J不为空集
             if len(J) > 0:
                 # 判断J是否在C中
@@ -332,7 +348,18 @@ def item_equal(a, b):
         return True
     return False
 
+# 令每个项目集Ik的下标k作为分析器的状态
+# ACTION 表项和 GOTO表项可按如下方法构造：
+#   若项目A ->α • aβ属于 Ik 且 GO (Ik, a)= Ij, 期望字符a 为终结符，则置ACTION[k, a] =sj (j表示新状态Ij);
+#       如果圆点不在项目k最后且圆点后的期待字符a为终结符，则ACTION[k, a] =sj (j表示新状态Ij)；
+#   若项目A ->α •属于Ik, 那么对任何终结符a, 置ACTION[k, a]=rj；其中，假定A->α为文法G 的第j个产生式；【对k到a进行归约】
+#       如果圆点不在项目k最后且圆点后的期待字符A为非终结符，则GOTO(k, A)=j (j表示文法中第j个产生式)；
+#   若项目S’ ->S • 属于Ik, 则置ACTION[k, #]为“acc”;【单词处理完毕】
+#       如果圆点在项目k最后且k不是S’ ->S，那么对所有终结符a，ACTION[k, a]=rj (j表示文法中第j个产生式)；
+#   若项目A ->α • Aβ属于 Ik，且GO (Ik, A)= Ij,期望字符 A为非终结符，则置GOTO(k, A)=j (j表示文法中第j个产生式);
+#       如果圆点在项目k最后且k是S’ ->S，则ACTION[k, #]为“acc”;
 
+# 分析表中凡不能用上述规则填入信息的空白格均置上“出错标志”
 # 输入文法G的拓广文法G'，获取LRO分析表
 def get_LRO_table(G):
     # 先获取LR0项目集规范族
@@ -349,7 +376,7 @@ def get_LRO_table(G):
                 character = item.right[item.index]
                 # 找出满足GOTO(I, character)=C[j]的j
                 for j in range(n):
-                    if set_equal(GOTO(G, I, character), C[j]):
+                    if set_equal(GO(G, I, character), C[j]):
                         # 如果character是终结符
                         if character in G['T']:
                             # 在action表里添加状态转移以及当前符号压入栈的提示
@@ -374,29 +401,38 @@ def get_LRO_table(G):
     return action, goto
 
 
-# 输入文法G的拓广文法G'，获取SLR(1)分析表
+# 输入文法G，获取SLR(1)分析表
+# 构造SLR(1)分析表的方法:
+# 1、把G扩广成G’
+# 2、对G’构造：得到LR(0)项目集规范族C；活前缀识别自动机的状态转换函数GO
+# 3、使用C和GOTO，构造SLR分析表：构造action和goto子表：
+#   若项目A ->α • aβ属于 Ik 且 GO (Ik, a)= Ij,期望字符a为终结符，则置ACTION[k, a] =sj (j表示新状态Ij);
+#   若项目A ->α • Aβ属于 Ik，且GOTO (Ik, A)= Ij,期望字符 A为非终结符，则置GOTO(k, A)=j (j表示文法中第j个产生式);
+#   若项目A ->α •属于Ik, 那么对任何终结符a，当满足a属于follow(A)时， 置ACTION[k, a]=rj；其中，假定A->α为文法G 的第j个产生式；
+#   若项目S’ ->S • 属于Ik, 则置ACTION[k, #]=“acc”;
+#   分析表中凡不能用上述规则填入信息的空白格均置上“出错标志”
 def get_SLR1_table(G):
-    # 这里的G还是非拓广文法
+    # 输入的G是非拓广文法，先求FOLLOW集
     FOLLOW = get_FOLLOW(G)
 
-    # 求G的拓广文法G'的LR0项目集
+    # 拓展文法G生成拓广文法G‘
     G['P'].insert(0, Production(G['S'] + "'", [G['S']]))
     G['V'].insert(0, G['S'] + "'")
+    # 输入文法G'，得到LR(0)项目集规范族C
     C = get_LR0_collection(G)
 
-    # action和goto表的初始化
+    # action和goto表的初始化, row is a dic
     n = len(C)
     row = {}
     for t in G['T']:
         row[t] = ""
-    row["#"] = ""
+    row["$"] = ""
     action = []
     for i in range(n):
         action.append(copy.copy(row))
 
     temp_V = set(G['V'])
     temp_V.discard(G['S'] + "'")
-    # print("temp_V = " + str(temp_V))
     row = {}
     for v in temp_V:
         row[v] = ""
@@ -412,7 +448,7 @@ def get_SLR1_table(G):
                 character = item.right[item.index]
                 # 找出满足GOTO(I, character)=C[j]的j
                 for j in range(n):
-                    if set_equal(GOTO(G, I, character), C[j]):
+                    if set_equal(GO(G, I, character), C[j]):
                         # 如果character是终结符
                         if character in G['T']:
                             # 在action表里添加状态转移以及当前符号压入栈的提示
@@ -427,7 +463,7 @@ def get_SLR1_table(G):
             else:
                 # 如果该表达式是S'->S，则在action表里添加acc
                 if item.left == G['S'] + "'":
-                    action[k]["#"] = "acc"
+                    action[k]["$"] = "acc"
                     continue
                 # 否则，找到P中对应的产生式序号
                 m = len(G['P'])
@@ -438,8 +474,8 @@ def get_SLR1_table(G):
                         for t in G['T']:
                             if t in FOLLOW_A:
                                 action[k][t] = "r" + str(j)
-                        if "#" in FOLLOW_A:
-                            action[k]["#"] = "r" + str(j)
+                        if "$" in FOLLOW_A:
+                            action[k]["$"] = "r" + str(j)
                         break
 
     # 输出action和goto表到文件
@@ -471,23 +507,7 @@ def get_SLR1_table(G):
     return action, goto
 
 
-# 语法分析树的结点
-class Node:
-    def __init__(self, character, token=None):
-        self.child = []
-        self.character = character
-        self.token = token
 
-    def add_child(self, node):
-        self.child.append(node)
-
-# 打印树的所有结点到文件
-def print_Node(node, write, h):
-    for i in range(h):
-        print("|\t", end="", file=write)
-    print(node.character, file=write)
-    for c in node.child:
-        print_Node(c, write, h+1)
 
 # 输入文法G、SLR(1)的action与goto分析表、词法分析得到的token串，输出LR分析结果以及对应的语法分析树至文件
 def LR_parser(G, action, goto, token):
@@ -503,7 +523,7 @@ def LR_parser(G, action, goto, token):
     # 状态栈
     stack_state = [0]
     # 符号栈
-    stack_character = ["#"]
+    stack_character = ["$"]
     # 输入缓冲区
     buffer = []
     for t in token:
@@ -516,7 +536,7 @@ def LR_parser(G, action, goto, token):
             buffer.append("digit")
         else:
             buffer.append(str(t[0]))
-    buffer.append("#")
+    buffer.append("$")
     # print("buffer = " + str(buffer))
     # 用于记录输入缓冲区当前下标的变量
     ip = 0
@@ -577,14 +597,13 @@ def LR_parser(G, action, goto, token):
             child_nodes = stack_node[len(stack_node) - n:]
             stack_node = stack_node[0: len(stack_node) - n]
             father = Node(A)
-            # print("father = " + father.character)
             for c in child_nodes:
                 father.add_child(c)
             stack_node.append(father)
 
         # 分析成功
         elif string == "acc":
-            print("SLR(1)分析成功，语法分析部分结束")
+            print("Successfully finished SLR(1) parsing，syntactic parser finished.")
             print("分析成功", file=write)
 
             filename = '8_Parse_Tree.txt'
@@ -593,7 +612,7 @@ def LR_parser(G, action, goto, token):
             print_Node(stack_node[0], write, 0)
             return root
 
-
+# finished
 # 读取表达式，自动生成集合V,T,P,S; 并且自动生成文法G=(V, T, P, S)
 # V:非终结符,   T:终结符/ε,    P:产生式   S:开始符号
 # 输入的表达式必须满足:1.开始符号S是第一条表达式的左部 2.单词用空格隔开 3.出现在左侧的都是非终结符V (CFG)
@@ -656,6 +675,7 @@ def get_G(filename):
     print("", file=write)
     print("S : " + str(S), file=write)
 
+    # 用字典存储G
     G = {'V': V, 'T': T, 'P': P, 'S': S}
     return G
 

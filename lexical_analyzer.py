@@ -124,6 +124,7 @@ def lex(source_filename):
                         index = temp.find('.')
                         if temp[index:].find('.') > 0:
                             tokens.append([temp, "ERROR"])
+                            print('lexical analysis found error.')
                         else:
                             tokens.append([temp, "FLOAT"])
 
@@ -132,6 +133,7 @@ def lex(source_filename):
                 # numbers can only be followed by operators, delimiters or space.
                 else:
                     tokens.append([temp, "ERROR"])
+                    print('lexical analysis found error.')
                 continue
 
             # when there is a ' or ", the following characters could be STRING
@@ -156,6 +158,7 @@ def lex(source_filename):
                 # 没找到另一端
                 else:
                     tokens.append([temp, "ERROR"])
+                    print('lexical analysis found error.')
                 i += 1
                 continue
 
@@ -178,6 +181,7 @@ def lex(source_filename):
             # 可能是标识符, 判断是否非法
             elif not temp[0].isalpha():
                 tokens.append([temp, "ERROR"])
+                print('lexical analysis found error.')
             else:
                 tokens.append([temp, "IDENTIFIER"])
 
@@ -188,7 +192,7 @@ def lex(source_filename):
     write = open(result_filename, 'w', encoding='UTF-8')
     for t in tokens:
         print('(%s, %s)' % (str(t[0]), str(t[1])), file=write)
-    print("已获取tokens序列，词法分析部分结束")
+    print("Successfully got the sequence of tokens，lexical analysis has finished.")
 
     return tokens
 
