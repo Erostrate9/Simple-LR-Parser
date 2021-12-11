@@ -192,7 +192,7 @@ def lex(source_filename):
             i += 1
         row += 1
 
-    result_filename = '1.tokens序列.txt'
+    result_filename = '1_tokens.txt'
     write = open(result_filename, 'w', encoding='UTF-8')
     for t in tokens:
         print('(%s, %s)' % (str(t[0]), str(t[1])), file=write)
@@ -203,7 +203,7 @@ def lex(source_filename):
 
 def main():
     # 读入源代码文件作为字符流
-    source_filename = '0.源代码.txt'
+    source_filename = '0_source_code.txt'
     # 获得对应单词序列并打印
     tokens = lex(source_filename)
     print(tokens)

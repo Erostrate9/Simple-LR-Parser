@@ -1,5 +1,5 @@
 import copy
-import 词法分析
+import lexical_analyzer
 
 
 # 产生式
@@ -163,7 +163,7 @@ def get_FIRST_alpha(FIRST, a):
 
 # 求G的所有FOLLOW(X)
 def get_FOLLOW(G):
-    filename = '5.FIRST集与FOLLOW集.txt'
+    filename = '5_FIRST_and_FOLLOW.txt'
     write = open(filename, 'w', encoding='UTF-8')
     # 获取FIRST集，并输出到文件
     FIRST = get_FIRST(G)
@@ -291,7 +291,7 @@ def get_LR0_collection(G):
                     C.append(J)
 
     # 输出LR0项目集规范族到文件
-    filename = '4.LR(0)项目集规范族.txt'
+    filename = '4_Canonical_Collection_of_LR(0)_items.txt'
     write = open(filename, 'w', encoding='UTF-8')
     for i in range(len(C)):
         print("I(" + str(i) + "):", file=write)
@@ -438,7 +438,7 @@ def get_SLR1_table(G):
                         break
 
     # 输出action和goto表到文件
-    filename = '6.SLR(1)分析表.txt'
+    filename = '6_SLR(1)_Parsing_Table.txt'
     write = open(filename, 'w', encoding='UTF-8')
     print("action:", file=write)
     print("[", end='', file=write)
@@ -479,7 +479,7 @@ class Node:
 
 # 输入文法G、SLR(1)的action与goto分析表、词法分析得到的token串，输出LR分析结果以及对应的语法分析树至文件
 def LR_analysis(G, action, goto, token):
-    filename = '7.LR分析过程.txt'
+    filename = '7_LR_Analysis.txt'
     write = open(filename, 'w', encoding='UTF-8')
 
     # id表
@@ -584,7 +584,7 @@ def get_G(filename):
     fp_read = open(filename, 'r', encoding='UTF-8')
     lines = fp_read.readlines()
 
-    result_filename = '3.文法G.txt'
+    result_filename = '3_CFG.txt'
     write = open(result_filename, 'w', encoding='UTF-8')
 
     P = []
@@ -636,9 +636,9 @@ def get_G(filename):
 
 
 def main():
-    token = 词法分析.lex('0.源代码.txt')
+    token = lexical_analyzer.lex('0_source_code.txt')
 
-    filename = "2.表达式_完整程序.txt"
+    filename = "2_regex.txt"
     G = get_G(filename)
     action, goto = get_SLR1_table(G)
 
