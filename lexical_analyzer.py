@@ -192,7 +192,7 @@ def lex(source_filename):
     write = open(result_filename, 'w', encoding='UTF-8')
     for t in tokens:
         print('(%s, %s)' % (str(t[0]), str(t[1])), file=write)
-    print("Successfully got the sequence of tokens，lexical analysis has finished.")
+    print("Successfully got the sequence of tokens，lexical analysis has been finished.")
 
     return tokens
 

@@ -43,7 +43,6 @@ def print_Node(node, write, h):
         print_Node(c, write, h+1)
 
 
-
 # finished
 # 求两个FIRST或FOLLOW集X，Y的并集
 # 若该并集比X大，则返回True，否则返回False
@@ -239,13 +238,24 @@ def get_FOLLOW(G):
 
     return FOLLOW
 
+# finished
+# 判断某个LR(0)项目是否在某个项目集中
+def item_in_set(item, set):
+    for i in set:
+        if item.left == i.left and item.right == i.right and item.index == i.index:
+            return True
+    return False
+
+# finished
 #CLOSURE(I)是这样定义的：
 #   首先I的项目都属于CLOSURE(I)；
 #   如果A->α• Bβ,则左部为B的每个产生式中的形如B->·γ项目，也属于CLOSURE(I)；
 # 求I的闭包
+# PS:圆点在坐标对应字符左侧
 def get_closure(G, I):
     J = copy.copy(I)
     for item in J:
+        # 圆点到末尾，换下一个项目.
         if item.index >= len(item.right):
             continue
         B = item.right[item.index]
@@ -258,14 +268,7 @@ def get_closure(G, I):
     return J
 
 
-# 判断某个LR(0)项目是否在某个项目集中，求闭包时需要用到
-def item_in_set(item, set):
-    for i in set:
-        if item.left == i.left and item.right == i.right and item.index == i.index:
-            return True
-    return False
-
-
+# finished
 # 项目集的转移函数
 # 求出项目集I关于非终结符X的后继项目集
 # GO(G,I，X)＝CLOSURE(J)
@@ -282,6 +285,23 @@ def GO(G, I, X):
             if X in G['V'] or X in G['T']:
                 J.append(Item(item.left, item.right, item.index + 1))
     return get_closure(G, J)
+
+# 判断两个LR(0)项目集是否相等
+def item_equal(a, b):
+    if a.left == b.left and a.right == b.right and a.index == b.index:
+        return True
+    return False
+
+# 判断两个项目集是否相等
+def set_equal(A, B):
+    n1 = len(A)
+    n2 = len(B)
+    if n1 != n2:
+        return False
+    for i in range(n1):
+        if not item_equal(A[i], B[i]):
+            return False
+    return True
 
 # 每个项目集对应一个DFA状态，它们的全体称为这个文法的项目集规范族
 # 用闭包函数（CLOSURE）来求DFA一个状态的项目集
@@ -330,23 +350,9 @@ def get_LR0_collection(G):
     return C
 
 
-# 判断两个项目集是否相等，求项目集规范族需要用到
-def set_equal(A, B):
-    n1 = len(A)
-    n2 = len(B)
-    if n1 != n2:
-        return False
-    for i in range(n1):
-        if not item_equal(A[i], B[i]):
-            return False
-    return True
 
 
-# 判断两个LR(0)项目集是否相等，求两个项目集相等需要用到
-def item_equal(a, b):
-    if a.left == b.left and a.right == b.right and a.index == b.index:
-        return True
-    return False
+
 
 # 令每个项目集Ik的下标k作为分析器的状态
 # ACTION 表项和 GOTO表项可按如下方法构造：
@@ -400,8 +406,7 @@ def get_LRO_table(G):
                             action[k][a] = "r" + str(j)
     return action, goto
 
-
-# 输入文法G，获取SLR(1)分析表
+# SLR(1)分析表是建立在 LR(0)分析表基础上的，因此首先需要完成 LR(0)分析表的前置条件，再加上 FOLLOW 集
 # 构造SLR(1)分析表的方法:
 # 1、把G扩广成G’
 # 2、对G’构造：得到LR(0)项目集规范族C；活前缀识别自动机的状态转换函数GO
@@ -411,6 +416,7 @@ def get_LRO_table(G):
 #   若项目A ->α •属于Ik, 那么对任何终结符a，当满足a属于follow(A)时， 置ACTION[k, a]=rj；其中，假定A->α为文法G 的第j个产生式；
 #   若项目S’ ->S • 属于Ik, 则置ACTION[k, #]=“acc”;
 #   分析表中凡不能用上述规则填入信息的空白格均置上“出错标志”
+# 输入文法G，获取SLR(1)分析表
 def get_SLR1_table(G):
     # 输入的G是非拓广文法，先求FOLLOW集
     FOLLOW = get_FOLLOW(G)
@@ -446,7 +452,7 @@ def get_SLR1_table(G):
             # 圆点不在右部表达式的最右侧，即还不需要归约
             if item.index < len(item.right):
                 character = item.right[item.index]
-                # 找出满足GOTO(I, character)=C[j]的j
+                # 找出满足GO(I, character)=C[j]的j
                 for j in range(n):
                     if set_equal(GO(G, I, character), C[j]):
                         # 如果character是终结符
@@ -456,7 +462,6 @@ def get_SLR1_table(G):
                         # 如果是非终结符
                         else:
                             # 在goto表里添加状态转移提示
-                            # 这里index-1是因为S'被去掉了
                             goto[k][character] = str(j)
                         break
             # 圆点在右部表达式的最右侧，即需要归约
@@ -470,7 +475,6 @@ def get_SLR1_table(G):
                 for j in range(1, m):
                     if G['P'][j].left == item.left and G['P'][j].right == item.right:
                         FOLLOW_A = FOLLOW[item.left]
-                        # print("FOLLOW(A) = " + str(FOLLOW_A))
                         for t in G['T']:
                             if t in FOLLOW_A:
                                 action[k][t] = "r" + str(j)
@@ -508,14 +512,13 @@ def get_SLR1_table(G):
 
 
 
-
+# action：s shift 移进符号入栈 状态入栈；
+#       r reduce 归约，状态出栈 符号出栈，归约后入栈，查goto表
+# goto: 新状态入栈
 # 输入文法G、SLR(1)的action与goto分析表、词法分析得到的token串，输出LR分析结果以及对应的语法分析树至文件
-def LR_parser(G, action, goto, token):
+def LR_parser(G, action, goto, tokens):
     filename = '7_LR_parser_Analysis.txt'
     write = open(filename, 'w', encoding='UTF-8')
-
-    # id表
-    # id_table = {}
 
     # 结点栈
     stack_node = []
@@ -526,11 +529,9 @@ def LR_parser(G, action, goto, token):
     stack_character = ["$"]
     # 输入缓冲区
     buffer = []
-    for t in token:
+    for t in tokens:
         if t[1] == "IDENTIFIER":
             buffer.append("id")
-            # if t[0] not in id_table.keys():
-            #     id_table[t[0]] = {}
 
         elif t[1] == "FLOAT" or t[1] == "INT":
             buffer.append("digit")
@@ -557,13 +558,13 @@ def LR_parser(G, action, goto, token):
             print(c, end=" ", file=write)
         print("", file=write)
 
-        # 获取SLR1分析表中对应的字符串
+        # 获取SLR(1)分析表中对应的字符串
         string = action[S][a]
         print("分析表内容: " + string, file=write)
         print("当前动作: ", end="", file=write)
         # 出错
         if string == '':
-            print("分析出错")
+            print("SLR(1) parsing FAILED.")
             print("分析出错", file=write)
             return
         # 需要转移至状态i，并且把a压入栈中
@@ -573,7 +574,7 @@ def LR_parser(G, action, goto, token):
             stack_character.append(a)
             stack_state.append(i)
 
-            stack_node.append(Node(a, token[ip]))  # 结点入栈
+            stack_node.append(Node(a, tokens[ip]))  # 结点入栈
             ip = ip + 1
 
         # 需要根据G中第k条产生式归约，两个栈各弹出n个符号，最后再查询goto表将新的状态压入状态栈
@@ -603,7 +604,7 @@ def LR_parser(G, action, goto, token):
 
         # 分析成功
         elif string == "acc":
-            print("Successfully finished SLR(1) parsing，syntactic parser finished.")
+            print("Successfully finished SLR(1) parsing，syntactic parser finished work.")
             print("分析成功", file=write)
 
             filename = '8_Parse_Tree.txt'
