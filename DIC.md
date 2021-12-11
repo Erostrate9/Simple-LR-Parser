@@ -1,0 +1,8 @@
+分界符	DELIMITER
+运算符	OPERATOR
+错误 ERROR
+浮点数	FLOAT
+整数 INT
+字符串 STRING
+关键词 KEYWORDS
+标识符 IDENTIFIER

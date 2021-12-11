@@ -1,3 +1,7 @@
+# 解释:
+# 读入：0_source_code.txt
+# 输出：1_tokens.txt
+
 # 词法分析器的生成器较难控制细节，这里采用手工编码实现法
 # 通过词法规则的描述，画出相关的有穷状态自动机
 # 最后逐个字符读出预处理后的源代码
@@ -76,29 +80,33 @@ def lex(source_filename):
             # Delimiters
             # 当前字符在分界符集中
             if line[i] in delimiters:
-                tokens.append([line[i], "分界符"])
+                tokens.append([line[i], "DELIMITER"])
                 i += 1
                 continue
 
+            # 先判断多符号运算符再判断单符号运算符，避免提取的是前缀
+            # multi-character operators
             # 多符号运算符
             if line[i] + line[i + 1] in operators:
                 temp = line[i] + line[i + 1]
                 i += 2
-                tokens.append([temp, "运算符"])
+                tokens.append([temp, "OPERATOR"])
                 continue
 
+            # single-character operators
             # 当前字符在运算符集中
             if line[i] in operators:
-                tokens.append([line[i], "运算符"])
+                tokens.append([line[i], "OPERATOR"])
                 i += 1
                 continue
+
+            # number (including int and float)
             # 当前字符为数字（包括整数和浮点数）
             if line[i].isdigit():
                 temp = ""
                 # 多个数字
                 while line[i].isdigit() or line[i] == '.':
                     temp += line[i]
-                    # print("temp = " + temp)
                     i += 1
                     if i > len(line) - 1:
                         break
@@ -111,21 +119,15 @@ def lex(source_filename):
                         # 防止有多个点的非法浮点数
                         index = temp.find('.')
                         if temp[index:].find('.') > 0:
-                            # print('(%s, %s, error)' % (str(row), temp), file=fp_write)
-                            tokens.append([temp, "错误"])
+                            tokens.append([temp, "ERROR"])
                         else:
-                            # print('(%s, %s, float)' % (str(row), temp), file=fp_write)
-
-                            tokens.append([temp, "浮点数"])
+                            tokens.append([temp, "FLOAT"])
 
                     else:
-                        # print('(%s, %s, integer)' % (str(row), temp), file=fp_write)
-
-                        tokens.append([temp, "整数"])
+                        tokens.append([temp, "INT"])
 
                 else:
-                    # print('(%s, %s, error)' % (str(row), temp), file=fp_write)
-                    tokens.append([temp, "错误"])
+                    tokens.append([temp, "ERROR"])
 
                 continue
             # 当前字符为字符串
@@ -148,16 +150,12 @@ def lex(source_filename):
 
                 # 找到了另一端
                 if line[i] == mark:
-                    # print('(%s, %s, string)' % (str(row), temp), file=fp_write)
-                    # print('(%s, %s, delimiters)' % (str(row), line[i]), file=fp_write)
-
-                    tokens.append([temp, "字符串"])
-                    tokens.append([line[i], "界符"])
+                    tokens.append([temp, "STRING"])
+                    tokens.append([line[i], "DELIMITER"])
 
                 # 没找到另一端
                 else:
-                    # print('(%s, %s, error)' % (str(row), temp), file=fp_write)
-                    tokens.append([temp, "错误"])
+                    tokens.append([temp, "ERROR"])
                 i += 1
                 continue
 
@@ -178,16 +176,16 @@ def lex(source_filename):
             if temp in keywords:
                 # print('(%s, %s, keywords)' % (str(row), temp), file=fp_write)
 
-                tokens.append([temp, "关键词"])
+                tokens.append([temp, "KEYWORDS"])
 
             # 当前字符可能是标识符（额外判断是否非法）
             else:
                 if not temp[0].isalpha():
                     # print('(%s, %s, error)' % (str(row), temp), file=fp_write)
-                    tokens.append([temp, "错误"])
+                    tokens.append([temp, "ERROR"])
                 else:
                     # print('(%s, %s, identifier)' % (str(row), temp), file=fp_write)
-                    tokens.append([temp, "标识符"])
+                    tokens.append([temp, "IDENTIFIER"])
 
             i += 1
         row += 1

@@ -495,12 +495,12 @@ def LR_analysis(G, action, goto, token):
     # 输入缓冲区
     buffer = []
     for t in token:
-        if t[1] == "标识符":
+        if t[1] == "IDENTIFIER":
             buffer.append("id")
             # if t[0] not in id_table.keys():
             #     id_table[t[0]] = {}
 
-        elif t[1] == "浮点数" or t[1] == "整数":
+        elif t[1] == "FLOAT" or t[1] == "INT":
             buffer.append("digit")
         else:
             buffer.append(str(t[0]))
