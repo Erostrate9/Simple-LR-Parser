@@ -87,7 +87,7 @@ def lex(source_filename):
             # 先判断多符号运算符再判断单符号运算符，避免提取的是前缀
             # multi-character operators
             # 多符号运算符
-            if line[i] + line[i + 1] in operators:
+            if i<len(line)-1 and line[i] + line[i + 1] in operators:
                 temp = line[i] + line[i + 1]
                 i += 2
                 tokens.append([temp, "OPERATOR"])
@@ -104,19 +104,23 @@ def lex(source_filename):
             # 当前字符为数字（包括整数和浮点数）
             if line[i].isdigit():
                 temp = ""
-                # 多个数字
+                # 读取一个由若干个数字或点组成的串
                 while line[i].isdigit() or line[i] == '.':
                     temp += line[i]
                     i += 1
+                    # reach the end of line
                     if i > len(line) - 1:
                         break
 
-                # 防止有以数字开头的标识符等非法
-                if line[i].isdigit() or line[i] in operators or line[i] in delimiters or line[i] == ' ':
+                # 防止几种非法情况的出现：
+                # 1. 数字开头的标识符
+                # 2. 有多个点的非法浮点数
+
+                if (i > len(line) - 1) or (line[i] in operators) or (line[i] in delimiters) or line[i] == ' ':
 
                     # 浮点数
                     if temp.find('.') != -1:
-                        # 防止有多个点的非法浮点数
+                        # 有多个点的浮点数非法
                         index = temp.find('.')
                         if temp[index:].find('.') > 0:
                             tokens.append([temp, "ERROR"])
@@ -125,34 +129,30 @@ def lex(source_filename):
 
                     else:
                         tokens.append([temp, "INT"])
-
+                # numbers can only be followed by operators, delimiters or space.
                 else:
                     tokens.append([temp, "ERROR"])
-
                 continue
-            # 当前字符为字符串
+
+            # when there is a ' or ", the following characters could be STRING
             if line[i] == '\"' or line[i] == '\'':
-                # print("line[i] == '\"' or line[i] == '\''")
-                # print('(%s, %s, delimiters)' % (str(row), line[i]), file=fp_write)
                 mark = line[i]
-                # print('mark = ' + mark)
                 temp = ""
                 i += 1
+                # trying to match another mark
                 while line[i] != mark:
                     temp += line[i]
-                    # print("temp = " + temp)
                     i += 1
+                    # when it reaches the end of line, rollback and make decision
                     if i == len(line):
                         i -= 1
-                        print("break = " + temp)
                         break
-                # print("temp = " + temp + " line[i] = "+line[i])
-
-                # 找到了另一端
+                # if it finds another mark
                 if line[i] == mark:
                     tokens.append([temp, "STRING"])
                     tokens.append([line[i], "DELIMITER"])
 
+                # 为了简单起见，表达式不允许跨行存在
                 # 没找到另一端
                 else:
                     tokens.append([temp, "ERROR"])
@@ -162,34 +162,28 @@ def lex(source_filename):
             # 当前字符为关键词或标识符
             # 先获取该关键词或标识符
             temp = ""
-            while True:
-                if i > len(line) - 1 or line[i] == ' ' or line[i] in operators or line[i] in delimiters:
-                    break
-                else:
-                    temp += line[i]
+            while (i <= len(line) - 1) \
+                    and (line[i] != ' ') \
+                    and (line[i] not in operators) \
+                    and (line[i] not in delimiters):
+                temp += line[i]
                 i += 1
-            i -= 1
-            # print("temp = " + str(temp))
-            # print("after line[i] = " + line[i])
             # 再判断
-            # 当前字符在关键词集中
-            if temp in keywords:
-                # print('(%s, %s, keywords)' % (str(row), temp), file=fp_write)
+            i -= 1
 
+            # if 在关键词集中
+            if temp in keywords:
                 tokens.append([temp, "KEYWORDS"])
 
-            # 当前字符可能是标识符（额外判断是否非法）
+            # 可能是标识符, 判断是否非法
+            elif not temp[0].isalpha():
+                tokens.append([temp, "ERROR"])
             else:
-                if not temp[0].isalpha():
-                    # print('(%s, %s, error)' % (str(row), temp), file=fp_write)
-                    tokens.append([temp, "ERROR"])
-                else:
-                    # print('(%s, %s, identifier)' % (str(row), temp), file=fp_write)
-                    tokens.append([temp, "IDENTIFIER"])
+                tokens.append([temp, "IDENTIFIER"])
 
             i += 1
         row += 1
-
+    # write the sequence of tokens into text file
     result_filename = '1_tokens.txt'
     write = open(result_filename, 'w', encoding='UTF-8')
     for t in tokens:

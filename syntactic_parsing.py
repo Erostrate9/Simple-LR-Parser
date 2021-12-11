@@ -229,7 +229,7 @@ def get_FOLLOW(G):
 
 
 # 求I的闭包
-def CLOSURE(G, I):
+def get_closure(G, I):
     J = copy.copy(I)
     for item in J:
         if item.index >= len(item.right):
@@ -265,7 +265,7 @@ def GO(G, I, X):
                 J.append(Item(item.left, item.right, item.index + 1))
     # print("J : ")
     # print_item(J)
-    return CLOSURE(G, J)
+    return get_closure(G, J)
 
 
 # 输入文法G'，计算LR(0)项目集规范族C
@@ -273,7 +273,7 @@ def get_LR0_collection(G):
     C = []
     I = []
     I.append(Item(G['P'][0].left, G['P'][0].right, 0))
-    C.append(CLOSURE(G, I))
+    C.append(get_closure(G, I))
     V_or_T = G['V'] + G['T']
     # print("V or T:"+str(V_or_T))
     for I in C:
@@ -478,8 +478,8 @@ class Node:
 
 
 # 输入文法G、SLR(1)的action与goto分析表、词法分析得到的token串，输出LR分析结果以及对应的语法分析树至文件
-def LR_analysis(G, action, goto, token):
-    filename = '7_LR_Analysis.txt'
+def LR_analyzer(G, action, goto, token):
+    filename = '7_LR_parser_Analysis.txt'
     write = open(filename, 'w', encoding='UTF-8')
 
     # id表
@@ -636,13 +636,18 @@ def get_G(filename):
 
 
 def main():
-    token = lexical_analyzer.lex('0_source_code.txt')
+    # invoke lexer to get the sequence of tokens
+    tokens = lexical_analyzer.lex('0_source_code.txt')
 
-    filename = "2_regex.txt"
+    # to get the grammar G.
+    filename = "2_Product.txt"
     G = get_G(filename)
+
+    # to get the SLR(1) parsing table
     action, goto = get_SLR1_table(G)
 
-    LR_analysis(G, action, goto, token)
+    # using simple LR parser with  G and SLR(1) parsing tables to analyze tokens
+    LR_analyzer(G, action, goto, tokens)
 
 
 if __name__ == '__main__':
