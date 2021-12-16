@@ -1,31 +1,26 @@
-
 /* This is
 multi-line
 note
 */
-int main(int a, int b, int c){
-    int d;
-    d = 1;
-    if (a <= b){
-        a = b;
+float max(float a,float b){
+    if(a<b){
+        return b;
     }
     else{
-        while (a > b){
-            a = -(a + 1) * b;
-        }
+        return a;
     }
-    return a;
 }
-
-
-float test(float e){
+int main(){
+    int times;
+    times = 0;
     float a;
-    a = 3 * (4 * (e + 1));
-    if ((a + 3 < 2) || (a - b > 3)){
-        a = b;
+    a=3.1;
+    float b;
+    b=4.2;
+    while(times<=3){
+        a=a+1;
+        b=b*b/3-5;
+        times=times+1;
     }
-    /*error
-    */
-    //a++
-    return e;
+    return times;
 }

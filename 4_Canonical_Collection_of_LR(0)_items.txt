@@ -1,581 +1,581 @@
 I(0):
-程序' -> . 程序 
-程序 -> . 函数定义 
-函数定义 -> . 函数定义 函数定义 
-函数定义 -> . 变量类型 id ( ) { 函数块 } 
-函数定义 -> . 变量类型 id ( 传入参数 ) { 函数块 } 
-变量类型 -> . int 
-变量类型 -> . float 
+PROGRAM' -> . PROGRAM 
+PROGRAM -> . DEFINE_FUNCTION 
+DEFINE_FUNCTION -> . DEFINE_FUNCTION DEFINE_FUNCTION 
+DEFINE_FUNCTION -> . VARIABLE_TYPE id ( ) { FUNCTION_BLOCK } 
+DEFINE_FUNCTION -> . VARIABLE_TYPE id ( INCOMING_PARAMETER ) { FUNCTION_BLOCK } 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(1):
-程序' -> 程序 .
+PROGRAM' -> PROGRAM .
 
 I(2):
-程序 -> 函数定义 .
-函数定义 -> 函数定义 . 函数定义 
-函数定义 -> . 函数定义 函数定义 
-函数定义 -> . 变量类型 id ( ) { 函数块 } 
-函数定义 -> . 变量类型 id ( 传入参数 ) { 函数块 } 
-变量类型 -> . int 
-变量类型 -> . float 
+PROGRAM -> DEFINE_FUNCTION .
+DEFINE_FUNCTION -> DEFINE_FUNCTION . DEFINE_FUNCTION 
+DEFINE_FUNCTION -> . DEFINE_FUNCTION DEFINE_FUNCTION 
+DEFINE_FUNCTION -> . VARIABLE_TYPE id ( ) { FUNCTION_BLOCK } 
+DEFINE_FUNCTION -> . VARIABLE_TYPE id ( INCOMING_PARAMETER ) { FUNCTION_BLOCK } 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(3):
-函数定义 -> 变量类型 . id ( ) { 函数块 } 
-函数定义 -> 变量类型 . id ( 传入参数 ) { 函数块 } 
+DEFINE_FUNCTION -> VARIABLE_TYPE . id ( ) { FUNCTION_BLOCK } 
+DEFINE_FUNCTION -> VARIABLE_TYPE . id ( INCOMING_PARAMETER ) { FUNCTION_BLOCK } 
 
 I(4):
-变量类型 -> int .
+VARIABLE_TYPE -> int .
 
 I(5):
-变量类型 -> float .
+VARIABLE_TYPE -> float .
 
 I(6):
-函数定义 -> 函数定义 函数定义 .
-函数定义 -> 函数定义 . 函数定义 
-函数定义 -> . 函数定义 函数定义 
-函数定义 -> . 变量类型 id ( ) { 函数块 } 
-函数定义 -> . 变量类型 id ( 传入参数 ) { 函数块 } 
-变量类型 -> . int 
-变量类型 -> . float 
+DEFINE_FUNCTION -> DEFINE_FUNCTION DEFINE_FUNCTION .
+DEFINE_FUNCTION -> DEFINE_FUNCTION . DEFINE_FUNCTION 
+DEFINE_FUNCTION -> . DEFINE_FUNCTION DEFINE_FUNCTION 
+DEFINE_FUNCTION -> . VARIABLE_TYPE id ( ) { FUNCTION_BLOCK } 
+DEFINE_FUNCTION -> . VARIABLE_TYPE id ( INCOMING_PARAMETER ) { FUNCTION_BLOCK } 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(7):
-函数定义 -> 变量类型 id . ( ) { 函数块 } 
-函数定义 -> 变量类型 id . ( 传入参数 ) { 函数块 } 
+DEFINE_FUNCTION -> VARIABLE_TYPE id . ( ) { FUNCTION_BLOCK } 
+DEFINE_FUNCTION -> VARIABLE_TYPE id . ( INCOMING_PARAMETER ) { FUNCTION_BLOCK } 
 
 I(8):
-函数定义 -> 变量类型 id ( . ) { 函数块 } 
-函数定义 -> 变量类型 id ( . 传入参数 ) { 函数块 } 
-传入参数 -> . 变量类型 id 
-传入参数 -> . 变量类型 id , 传入参数 
-变量类型 -> . int 
-变量类型 -> . float 
+DEFINE_FUNCTION -> VARIABLE_TYPE id ( . ) { FUNCTION_BLOCK } 
+DEFINE_FUNCTION -> VARIABLE_TYPE id ( . INCOMING_PARAMETER ) { FUNCTION_BLOCK } 
+INCOMING_PARAMETER -> . VARIABLE_TYPE id 
+INCOMING_PARAMETER -> . VARIABLE_TYPE id , INCOMING_PARAMETER 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(9):
-函数定义 -> 变量类型 id ( 传入参数 . ) { 函数块 } 
+DEFINE_FUNCTION -> VARIABLE_TYPE id ( INCOMING_PARAMETER . ) { FUNCTION_BLOCK } 
 
 I(10):
-传入参数 -> 变量类型 . id 
-传入参数 -> 变量类型 . id , 传入参数 
+INCOMING_PARAMETER -> VARIABLE_TYPE . id 
+INCOMING_PARAMETER -> VARIABLE_TYPE . id , INCOMING_PARAMETER 
 
 I(11):
-函数定义 -> 变量类型 id ( ) . { 函数块 } 
+DEFINE_FUNCTION -> VARIABLE_TYPE id ( ) . { FUNCTION_BLOCK } 
 
 I(12):
-函数定义 -> 变量类型 id ( 传入参数 ) . { 函数块 } 
+DEFINE_FUNCTION -> VARIABLE_TYPE id ( INCOMING_PARAMETER ) . { FUNCTION_BLOCK } 
 
 I(13):
-传入参数 -> 变量类型 id .
-传入参数 -> 变量类型 id . , 传入参数 
+INCOMING_PARAMETER -> VARIABLE_TYPE id .
+INCOMING_PARAMETER -> VARIABLE_TYPE id . , INCOMING_PARAMETER 
 
 I(14):
-函数定义 -> 变量类型 id ( ) { . 函数块 } 
-函数块 -> . 函数块 函数块 
-函数块 -> . 变量类型 id ; 
-函数块 -> . id = 算术表达式 ; 
-函数块 -> . while ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } else { 函数块 } 
-函数块 -> . return ; 
-函数块 -> . return 算术表达式 ; 
-变量类型 -> . int 
-变量类型 -> . float 
+DEFINE_FUNCTION -> VARIABLE_TYPE id ( ) { . FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . FUNCTION_BLOCK FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . VARIABLE_TYPE id ; 
+FUNCTION_BLOCK -> . id = ARITHMETIC_EXPRESSION ; 
+FUNCTION_BLOCK -> . while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . return ; 
+FUNCTION_BLOCK -> . return ARITHMETIC_EXPRESSION ; 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(15):
-函数定义 -> 变量类型 id ( 传入参数 ) { . 函数块 } 
-函数块 -> . 函数块 函数块 
-函数块 -> . 变量类型 id ; 
-函数块 -> . id = 算术表达式 ; 
-函数块 -> . while ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } else { 函数块 } 
-函数块 -> . return ; 
-函数块 -> . return 算术表达式 ; 
-变量类型 -> . int 
-变量类型 -> . float 
+DEFINE_FUNCTION -> VARIABLE_TYPE id ( INCOMING_PARAMETER ) { . FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . FUNCTION_BLOCK FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . VARIABLE_TYPE id ; 
+FUNCTION_BLOCK -> . id = ARITHMETIC_EXPRESSION ; 
+FUNCTION_BLOCK -> . while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . return ; 
+FUNCTION_BLOCK -> . return ARITHMETIC_EXPRESSION ; 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(16):
-传入参数 -> 变量类型 id , . 传入参数 
-传入参数 -> . 变量类型 id 
-传入参数 -> . 变量类型 id , 传入参数 
-变量类型 -> . int 
-变量类型 -> . float 
+INCOMING_PARAMETER -> VARIABLE_TYPE id , . INCOMING_PARAMETER 
+INCOMING_PARAMETER -> . VARIABLE_TYPE id 
+INCOMING_PARAMETER -> . VARIABLE_TYPE id , INCOMING_PARAMETER 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(17):
-函数定义 -> 变量类型 id ( ) { 函数块 . } 
-函数块 -> 函数块 . 函数块 
-函数块 -> . 函数块 函数块 
-函数块 -> . 变量类型 id ; 
-函数块 -> . id = 算术表达式 ; 
-函数块 -> . while ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } else { 函数块 } 
-函数块 -> . return ; 
-函数块 -> . return 算术表达式 ; 
-变量类型 -> . int 
-变量类型 -> . float 
+DEFINE_FUNCTION -> VARIABLE_TYPE id ( ) { FUNCTION_BLOCK . } 
+FUNCTION_BLOCK -> FUNCTION_BLOCK . FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . FUNCTION_BLOCK FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . VARIABLE_TYPE id ; 
+FUNCTION_BLOCK -> . id = ARITHMETIC_EXPRESSION ; 
+FUNCTION_BLOCK -> . while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . return ; 
+FUNCTION_BLOCK -> . return ARITHMETIC_EXPRESSION ; 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(18):
-函数块 -> 变量类型 . id ; 
+FUNCTION_BLOCK -> VARIABLE_TYPE . id ; 
 
 I(19):
-函数块 -> id . = 算术表达式 ; 
+FUNCTION_BLOCK -> id . = ARITHMETIC_EXPRESSION ; 
 
 I(20):
-函数块 -> while . ( 布尔表达式 ) { 函数块 } 
+FUNCTION_BLOCK -> while . ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
 
 I(21):
-函数块 -> if . ( 布尔表达式 ) { 函数块 } 
-函数块 -> if . ( 布尔表达式 ) { 函数块 } else { 函数块 } 
+FUNCTION_BLOCK -> if . ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> if . ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
 
 I(22):
-函数块 -> return . ; 
-函数块 -> return . 算术表达式 ; 
-算术表达式 -> . 算术表达式 算术运算符 算术表达式 
-算术表达式 -> . - 算术表达式 
-算术表达式 -> . ( 算术表达式 ) 
-算术表达式 -> . id 
-算术表达式 -> . digit 
+FUNCTION_BLOCK -> return . ; 
+FUNCTION_BLOCK -> return . ARITHMETIC_EXPRESSION ; 
+ARITHMETIC_EXPRESSION -> . ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . - ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ( ARITHMETIC_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> . id 
+ARITHMETIC_EXPRESSION -> . digit 
 
 I(23):
-函数定义 -> 变量类型 id ( 传入参数 ) { 函数块 . } 
-函数块 -> 函数块 . 函数块 
-函数块 -> . 函数块 函数块 
-函数块 -> . 变量类型 id ; 
-函数块 -> . id = 算术表达式 ; 
-函数块 -> . while ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } else { 函数块 } 
-函数块 -> . return ; 
-函数块 -> . return 算术表达式 ; 
-变量类型 -> . int 
-变量类型 -> . float 
+DEFINE_FUNCTION -> VARIABLE_TYPE id ( INCOMING_PARAMETER ) { FUNCTION_BLOCK . } 
+FUNCTION_BLOCK -> FUNCTION_BLOCK . FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . FUNCTION_BLOCK FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . VARIABLE_TYPE id ; 
+FUNCTION_BLOCK -> . id = ARITHMETIC_EXPRESSION ; 
+FUNCTION_BLOCK -> . while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . return ; 
+FUNCTION_BLOCK -> . return ARITHMETIC_EXPRESSION ; 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(24):
-传入参数 -> 变量类型 id , 传入参数 .
+INCOMING_PARAMETER -> VARIABLE_TYPE id , INCOMING_PARAMETER .
 
 I(25):
-函数块 -> 函数块 函数块 .
-函数块 -> 函数块 . 函数块 
-函数块 -> . 函数块 函数块 
-函数块 -> . 变量类型 id ; 
-函数块 -> . id = 算术表达式 ; 
-函数块 -> . while ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } else { 函数块 } 
-函数块 -> . return ; 
-函数块 -> . return 算术表达式 ; 
-变量类型 -> . int 
-变量类型 -> . float 
+FUNCTION_BLOCK -> FUNCTION_BLOCK FUNCTION_BLOCK .
+FUNCTION_BLOCK -> FUNCTION_BLOCK . FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . FUNCTION_BLOCK FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . VARIABLE_TYPE id ; 
+FUNCTION_BLOCK -> . id = ARITHMETIC_EXPRESSION ; 
+FUNCTION_BLOCK -> . while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . return ; 
+FUNCTION_BLOCK -> . return ARITHMETIC_EXPRESSION ; 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(26):
-函数定义 -> 变量类型 id ( ) { 函数块 } .
+DEFINE_FUNCTION -> VARIABLE_TYPE id ( ) { FUNCTION_BLOCK } .
 
 I(27):
-函数块 -> 变量类型 id . ; 
+FUNCTION_BLOCK -> VARIABLE_TYPE id . ; 
 
 I(28):
-函数块 -> id = . 算术表达式 ; 
-算术表达式 -> . 算术表达式 算术运算符 算术表达式 
-算术表达式 -> . - 算术表达式 
-算术表达式 -> . ( 算术表达式 ) 
-算术表达式 -> . id 
-算术表达式 -> . digit 
+FUNCTION_BLOCK -> id = . ARITHMETIC_EXPRESSION ; 
+ARITHMETIC_EXPRESSION -> . ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . - ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ( ARITHMETIC_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> . id 
+ARITHMETIC_EXPRESSION -> . digit 
 
 I(29):
-函数块 -> while ( . 布尔表达式 ) { 函数块 } 
-布尔表达式 -> . 算术表达式 比较运算符 算术表达式 
-布尔表达式 -> . 布尔表达式 && 布尔表达式 
-布尔表达式 -> . 布尔表达式 || 布尔表达式 
-布尔表达式 -> . ! 布尔表达式 
-布尔表达式 -> . ( 布尔表达式 ) 
-布尔表达式 -> . true 
-布尔表达式 -> . false 
-算术表达式 -> . 算术表达式 算术运算符 算术表达式 
-算术表达式 -> . - 算术表达式 
-算术表达式 -> . ( 算术表达式 ) 
-算术表达式 -> . id 
-算术表达式 -> . digit 
+FUNCTION_BLOCK -> while ( . BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+BOOL_EXPRESSION -> . ARITHMETIC_EXPRESSION COMPARISON_OPERATOR ARITHMETIC_EXPRESSION 
+BOOL_EXPRESSION -> . BOOL_EXPRESSION && BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . BOOL_EXPRESSION || BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ! BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ( BOOL_EXPRESSION ) 
+BOOL_EXPRESSION -> . true 
+BOOL_EXPRESSION -> . false 
+ARITHMETIC_EXPRESSION -> . ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . - ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ( ARITHMETIC_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> . id 
+ARITHMETIC_EXPRESSION -> . digit 
 
 I(30):
-函数块 -> if ( . 布尔表达式 ) { 函数块 } 
-函数块 -> if ( . 布尔表达式 ) { 函数块 } else { 函数块 } 
-布尔表达式 -> . 算术表达式 比较运算符 算术表达式 
-布尔表达式 -> . 布尔表达式 && 布尔表达式 
-布尔表达式 -> . 布尔表达式 || 布尔表达式 
-布尔表达式 -> . ! 布尔表达式 
-布尔表达式 -> . ( 布尔表达式 ) 
-布尔表达式 -> . true 
-布尔表达式 -> . false 
-算术表达式 -> . 算术表达式 算术运算符 算术表达式 
-算术表达式 -> . - 算术表达式 
-算术表达式 -> . ( 算术表达式 ) 
-算术表达式 -> . id 
-算术表达式 -> . digit 
+FUNCTION_BLOCK -> if ( . BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> if ( . BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+BOOL_EXPRESSION -> . ARITHMETIC_EXPRESSION COMPARISON_OPERATOR ARITHMETIC_EXPRESSION 
+BOOL_EXPRESSION -> . BOOL_EXPRESSION && BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . BOOL_EXPRESSION || BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ! BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ( BOOL_EXPRESSION ) 
+BOOL_EXPRESSION -> . true 
+BOOL_EXPRESSION -> . false 
+ARITHMETIC_EXPRESSION -> . ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . - ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ( ARITHMETIC_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> . id 
+ARITHMETIC_EXPRESSION -> . digit 
 
 I(31):
-函数块 -> return 算术表达式 . ; 
-算术表达式 -> 算术表达式 . 算术运算符 算术表达式 
-算术运算符 -> . + 
-算术运算符 -> . - 
-算术运算符 -> . * 
-算术运算符 -> . / 
+FUNCTION_BLOCK -> return ARITHMETIC_EXPRESSION . ; 
+ARITHMETIC_EXPRESSION -> ARITHMETIC_EXPRESSION . ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_OPERATOR -> . + 
+ARITHMETIC_OPERATOR -> . - 
+ARITHMETIC_OPERATOR -> . * 
+ARITHMETIC_OPERATOR -> . / 
 
 I(32):
-算术表达式 -> id .
+ARITHMETIC_EXPRESSION -> id .
 
 I(33):
-算术表达式 -> ( . 算术表达式 ) 
-算术表达式 -> . 算术表达式 算术运算符 算术表达式 
-算术表达式 -> . - 算术表达式 
-算术表达式 -> . ( 算术表达式 ) 
-算术表达式 -> . id 
-算术表达式 -> . digit 
+ARITHMETIC_EXPRESSION -> ( . ARITHMETIC_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> . ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . - ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ( ARITHMETIC_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> . id 
+ARITHMETIC_EXPRESSION -> . digit 
 
 I(34):
-函数块 -> return ; .
+FUNCTION_BLOCK -> return ; .
 
 I(35):
-算术表达式 -> - . 算术表达式 
-算术表达式 -> . 算术表达式 算术运算符 算术表达式 
-算术表达式 -> . - 算术表达式 
-算术表达式 -> . ( 算术表达式 ) 
-算术表达式 -> . id 
-算术表达式 -> . digit 
+ARITHMETIC_EXPRESSION -> - . ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . - ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ( ARITHMETIC_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> . id 
+ARITHMETIC_EXPRESSION -> . digit 
 
 I(36):
-算术表达式 -> digit .
+ARITHMETIC_EXPRESSION -> digit .
 
 I(37):
-函数定义 -> 变量类型 id ( 传入参数 ) { 函数块 } .
+DEFINE_FUNCTION -> VARIABLE_TYPE id ( INCOMING_PARAMETER ) { FUNCTION_BLOCK } .
 
 I(38):
-函数块 -> 变量类型 id ; .
+FUNCTION_BLOCK -> VARIABLE_TYPE id ; .
 
 I(39):
-函数块 -> id = 算术表达式 . ; 
-算术表达式 -> 算术表达式 . 算术运算符 算术表达式 
-算术运算符 -> . + 
-算术运算符 -> . - 
-算术运算符 -> . * 
-算术运算符 -> . / 
+FUNCTION_BLOCK -> id = ARITHMETIC_EXPRESSION . ; 
+ARITHMETIC_EXPRESSION -> ARITHMETIC_EXPRESSION . ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_OPERATOR -> . + 
+ARITHMETIC_OPERATOR -> . - 
+ARITHMETIC_OPERATOR -> . * 
+ARITHMETIC_OPERATOR -> . / 
 
 I(40):
-布尔表达式 -> 算术表达式 . 比较运算符 算术表达式 
-算术表达式 -> 算术表达式 . 算术运算符 算术表达式 
-比较运算符 -> . < 
-比较运算符 -> . > 
-比较运算符 -> . <= 
-比较运算符 -> . >= 
-比较运算符 -> . == 
-比较运算符 -> . != 
-算术运算符 -> . + 
-算术运算符 -> . - 
-算术运算符 -> . * 
-算术运算符 -> . / 
+BOOL_EXPRESSION -> ARITHMETIC_EXPRESSION . COMPARISON_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> ARITHMETIC_EXPRESSION . ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+COMPARISON_OPERATOR -> . < 
+COMPARISON_OPERATOR -> . > 
+COMPARISON_OPERATOR -> . <= 
+COMPARISON_OPERATOR -> . >= 
+COMPARISON_OPERATOR -> . == 
+COMPARISON_OPERATOR -> . != 
+ARITHMETIC_OPERATOR -> . + 
+ARITHMETIC_OPERATOR -> . - 
+ARITHMETIC_OPERATOR -> . * 
+ARITHMETIC_OPERATOR -> . / 
 
 I(41):
-函数块 -> while ( 布尔表达式 . ) { 函数块 } 
-布尔表达式 -> 布尔表达式 . && 布尔表达式 
-布尔表达式 -> 布尔表达式 . || 布尔表达式 
+FUNCTION_BLOCK -> while ( BOOL_EXPRESSION . ) { FUNCTION_BLOCK } 
+BOOL_EXPRESSION -> BOOL_EXPRESSION . && BOOL_EXPRESSION 
+BOOL_EXPRESSION -> BOOL_EXPRESSION . || BOOL_EXPRESSION 
 
 I(42):
-布尔表达式 -> ( . 布尔表达式 ) 
-算术表达式 -> ( . 算术表达式 ) 
-布尔表达式 -> . 算术表达式 比较运算符 算术表达式 
-布尔表达式 -> . 布尔表达式 && 布尔表达式 
-布尔表达式 -> . 布尔表达式 || 布尔表达式 
-布尔表达式 -> . ! 布尔表达式 
-布尔表达式 -> . ( 布尔表达式 ) 
-布尔表达式 -> . true 
-布尔表达式 -> . false 
-算术表达式 -> . 算术表达式 算术运算符 算术表达式 
-算术表达式 -> . - 算术表达式 
-算术表达式 -> . ( 算术表达式 ) 
-算术表达式 -> . id 
-算术表达式 -> . digit 
+BOOL_EXPRESSION -> ( . BOOL_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> ( . ARITHMETIC_EXPRESSION ) 
+BOOL_EXPRESSION -> . ARITHMETIC_EXPRESSION COMPARISON_OPERATOR ARITHMETIC_EXPRESSION 
+BOOL_EXPRESSION -> . BOOL_EXPRESSION && BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . BOOL_EXPRESSION || BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ! BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ( BOOL_EXPRESSION ) 
+BOOL_EXPRESSION -> . true 
+BOOL_EXPRESSION -> . false 
+ARITHMETIC_EXPRESSION -> . ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . - ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ( ARITHMETIC_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> . id 
+ARITHMETIC_EXPRESSION -> . digit 
 
 I(43):
-布尔表达式 -> ! . 布尔表达式 
-布尔表达式 -> . 算术表达式 比较运算符 算术表达式 
-布尔表达式 -> . 布尔表达式 && 布尔表达式 
-布尔表达式 -> . 布尔表达式 || 布尔表达式 
-布尔表达式 -> . ! 布尔表达式 
-布尔表达式 -> . ( 布尔表达式 ) 
-布尔表达式 -> . true 
-布尔表达式 -> . false 
-算术表达式 -> . 算术表达式 算术运算符 算术表达式 
-算术表达式 -> . - 算术表达式 
-算术表达式 -> . ( 算术表达式 ) 
-算术表达式 -> . id 
-算术表达式 -> . digit 
+BOOL_EXPRESSION -> ! . BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ARITHMETIC_EXPRESSION COMPARISON_OPERATOR ARITHMETIC_EXPRESSION 
+BOOL_EXPRESSION -> . BOOL_EXPRESSION && BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . BOOL_EXPRESSION || BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ! BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ( BOOL_EXPRESSION ) 
+BOOL_EXPRESSION -> . true 
+BOOL_EXPRESSION -> . false 
+ARITHMETIC_EXPRESSION -> . ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . - ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ( ARITHMETIC_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> . id 
+ARITHMETIC_EXPRESSION -> . digit 
 
 I(44):
-布尔表达式 -> true .
+BOOL_EXPRESSION -> true .
 
 I(45):
-布尔表达式 -> false .
+BOOL_EXPRESSION -> false .
 
 I(46):
-函数块 -> if ( 布尔表达式 . ) { 函数块 } 
-函数块 -> if ( 布尔表达式 . ) { 函数块 } else { 函数块 } 
-布尔表达式 -> 布尔表达式 . && 布尔表达式 
-布尔表达式 -> 布尔表达式 . || 布尔表达式 
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION . ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION . ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+BOOL_EXPRESSION -> BOOL_EXPRESSION . && BOOL_EXPRESSION 
+BOOL_EXPRESSION -> BOOL_EXPRESSION . || BOOL_EXPRESSION 
 
 I(47):
-算术表达式 -> 算术表达式 算术运算符 . 算术表达式 
-算术表达式 -> . 算术表达式 算术运算符 算术表达式 
-算术表达式 -> . - 算术表达式 
-算术表达式 -> . ( 算术表达式 ) 
-算术表达式 -> . id 
-算术表达式 -> . digit 
+ARITHMETIC_EXPRESSION -> ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR . ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . - ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ( ARITHMETIC_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> . id 
+ARITHMETIC_EXPRESSION -> . digit 
 
 I(48):
-函数块 -> return 算术表达式 ; .
+FUNCTION_BLOCK -> return ARITHMETIC_EXPRESSION ; .
 
 I(49):
-算术运算符 -> - .
+ARITHMETIC_OPERATOR -> - .
 
 I(50):
-算术运算符 -> + .
+ARITHMETIC_OPERATOR -> + .
 
 I(51):
-算术运算符 -> * .
+ARITHMETIC_OPERATOR -> * .
 
 I(52):
-算术运算符 -> / .
+ARITHMETIC_OPERATOR -> / .
 
 I(53):
-算术表达式 -> ( 算术表达式 . ) 
-算术表达式 -> 算术表达式 . 算术运算符 算术表达式 
-算术运算符 -> . + 
-算术运算符 -> . - 
-算术运算符 -> . * 
-算术运算符 -> . / 
+ARITHMETIC_EXPRESSION -> ( ARITHMETIC_EXPRESSION . ) 
+ARITHMETIC_EXPRESSION -> ARITHMETIC_EXPRESSION . ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_OPERATOR -> . + 
+ARITHMETIC_OPERATOR -> . - 
+ARITHMETIC_OPERATOR -> . * 
+ARITHMETIC_OPERATOR -> . / 
 
 I(54):
-算术表达式 -> - 算术表达式 .
-算术表达式 -> 算术表达式 . 算术运算符 算术表达式 
-算术运算符 -> . + 
-算术运算符 -> . - 
-算术运算符 -> . * 
-算术运算符 -> . / 
+ARITHMETIC_EXPRESSION -> - ARITHMETIC_EXPRESSION .
+ARITHMETIC_EXPRESSION -> ARITHMETIC_EXPRESSION . ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_OPERATOR -> . + 
+ARITHMETIC_OPERATOR -> . - 
+ARITHMETIC_OPERATOR -> . * 
+ARITHMETIC_OPERATOR -> . / 
 
 I(55):
-函数块 -> id = 算术表达式 ; .
+FUNCTION_BLOCK -> id = ARITHMETIC_EXPRESSION ; .
 
 I(56):
-布尔表达式 -> 算术表达式 比较运算符 . 算术表达式 
-算术表达式 -> . 算术表达式 算术运算符 算术表达式 
-算术表达式 -> . - 算术表达式 
-算术表达式 -> . ( 算术表达式 ) 
-算术表达式 -> . id 
-算术表达式 -> . digit 
+BOOL_EXPRESSION -> ARITHMETIC_EXPRESSION COMPARISON_OPERATOR . ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . - ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ( ARITHMETIC_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> . id 
+ARITHMETIC_EXPRESSION -> . digit 
 
 I(57):
-比较运算符 -> < .
+COMPARISON_OPERATOR -> < .
 
 I(58):
-比较运算符 -> > .
+COMPARISON_OPERATOR -> > .
 
 I(59):
-比较运算符 -> <= .
+COMPARISON_OPERATOR -> <= .
 
 I(60):
-比较运算符 -> >= .
+COMPARISON_OPERATOR -> >= .
 
 I(61):
-比较运算符 -> == .
+COMPARISON_OPERATOR -> == .
 
 I(62):
-比较运算符 -> != .
+COMPARISON_OPERATOR -> != .
 
 I(63):
-函数块 -> while ( 布尔表达式 ) . { 函数块 } 
+FUNCTION_BLOCK -> while ( BOOL_EXPRESSION ) . { FUNCTION_BLOCK } 
 
 I(64):
-布尔表达式 -> 布尔表达式 && . 布尔表达式 
-布尔表达式 -> . 算术表达式 比较运算符 算术表达式 
-布尔表达式 -> . 布尔表达式 && 布尔表达式 
-布尔表达式 -> . 布尔表达式 || 布尔表达式 
-布尔表达式 -> . ! 布尔表达式 
-布尔表达式 -> . ( 布尔表达式 ) 
-布尔表达式 -> . true 
-布尔表达式 -> . false 
-算术表达式 -> . 算术表达式 算术运算符 算术表达式 
-算术表达式 -> . - 算术表达式 
-算术表达式 -> . ( 算术表达式 ) 
-算术表达式 -> . id 
-算术表达式 -> . digit 
+BOOL_EXPRESSION -> BOOL_EXPRESSION && . BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ARITHMETIC_EXPRESSION COMPARISON_OPERATOR ARITHMETIC_EXPRESSION 
+BOOL_EXPRESSION -> . BOOL_EXPRESSION && BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . BOOL_EXPRESSION || BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ! BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ( BOOL_EXPRESSION ) 
+BOOL_EXPRESSION -> . true 
+BOOL_EXPRESSION -> . false 
+ARITHMETIC_EXPRESSION -> . ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . - ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ( ARITHMETIC_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> . id 
+ARITHMETIC_EXPRESSION -> . digit 
 
 I(65):
-布尔表达式 -> 布尔表达式 || . 布尔表达式 
-布尔表达式 -> . 算术表达式 比较运算符 算术表达式 
-布尔表达式 -> . 布尔表达式 && 布尔表达式 
-布尔表达式 -> . 布尔表达式 || 布尔表达式 
-布尔表达式 -> . ! 布尔表达式 
-布尔表达式 -> . ( 布尔表达式 ) 
-布尔表达式 -> . true 
-布尔表达式 -> . false 
-算术表达式 -> . 算术表达式 算术运算符 算术表达式 
-算术表达式 -> . - 算术表达式 
-算术表达式 -> . ( 算术表达式 ) 
-算术表达式 -> . id 
-算术表达式 -> . digit 
+BOOL_EXPRESSION -> BOOL_EXPRESSION || . BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ARITHMETIC_EXPRESSION COMPARISON_OPERATOR ARITHMETIC_EXPRESSION 
+BOOL_EXPRESSION -> . BOOL_EXPRESSION && BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . BOOL_EXPRESSION || BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ! BOOL_EXPRESSION 
+BOOL_EXPRESSION -> . ( BOOL_EXPRESSION ) 
+BOOL_EXPRESSION -> . true 
+BOOL_EXPRESSION -> . false 
+ARITHMETIC_EXPRESSION -> . ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . - ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> . ( ARITHMETIC_EXPRESSION ) 
+ARITHMETIC_EXPRESSION -> . id 
+ARITHMETIC_EXPRESSION -> . digit 
 
 I(66):
-算术表达式 -> ( 算术表达式 . ) 
-布尔表达式 -> 算术表达式 . 比较运算符 算术表达式 
-算术表达式 -> 算术表达式 . 算术运算符 算术表达式 
-比较运算符 -> . < 
-比较运算符 -> . > 
-比较运算符 -> . <= 
-比较运算符 -> . >= 
-比较运算符 -> . == 
-比较运算符 -> . != 
-算术运算符 -> . + 
-算术运算符 -> . - 
-算术运算符 -> . * 
-算术运算符 -> . / 
+ARITHMETIC_EXPRESSION -> ( ARITHMETIC_EXPRESSION . ) 
+BOOL_EXPRESSION -> ARITHMETIC_EXPRESSION . COMPARISON_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_EXPRESSION -> ARITHMETIC_EXPRESSION . ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+COMPARISON_OPERATOR -> . < 
+COMPARISON_OPERATOR -> . > 
+COMPARISON_OPERATOR -> . <= 
+COMPARISON_OPERATOR -> . >= 
+COMPARISON_OPERATOR -> . == 
+COMPARISON_OPERATOR -> . != 
+ARITHMETIC_OPERATOR -> . + 
+ARITHMETIC_OPERATOR -> . - 
+ARITHMETIC_OPERATOR -> . * 
+ARITHMETIC_OPERATOR -> . / 
 
 I(67):
-布尔表达式 -> ( 布尔表达式 . ) 
-布尔表达式 -> 布尔表达式 . && 布尔表达式 
-布尔表达式 -> 布尔表达式 . || 布尔表达式 
+BOOL_EXPRESSION -> ( BOOL_EXPRESSION . ) 
+BOOL_EXPRESSION -> BOOL_EXPRESSION . && BOOL_EXPRESSION 
+BOOL_EXPRESSION -> BOOL_EXPRESSION . || BOOL_EXPRESSION 
 
 I(68):
-布尔表达式 -> ! 布尔表达式 .
-布尔表达式 -> 布尔表达式 . && 布尔表达式 
-布尔表达式 -> 布尔表达式 . || 布尔表达式 
+BOOL_EXPRESSION -> ! BOOL_EXPRESSION .
+BOOL_EXPRESSION -> BOOL_EXPRESSION . && BOOL_EXPRESSION 
+BOOL_EXPRESSION -> BOOL_EXPRESSION . || BOOL_EXPRESSION 
 
 I(69):
-函数块 -> if ( 布尔表达式 ) . { 函数块 } 
-函数块 -> if ( 布尔表达式 ) . { 函数块 } else { 函数块 } 
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) . { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) . { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
 
 I(70):
-算术表达式 -> 算术表达式 算术运算符 算术表达式 .
-算术表达式 -> 算术表达式 . 算术运算符 算术表达式 
-算术运算符 -> . + 
-算术运算符 -> . - 
-算术运算符 -> . * 
-算术运算符 -> . / 
+ARITHMETIC_EXPRESSION -> ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION .
+ARITHMETIC_EXPRESSION -> ARITHMETIC_EXPRESSION . ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_OPERATOR -> . + 
+ARITHMETIC_OPERATOR -> . - 
+ARITHMETIC_OPERATOR -> . * 
+ARITHMETIC_OPERATOR -> . / 
 
 I(71):
-算术表达式 -> ( 算术表达式 ) .
+ARITHMETIC_EXPRESSION -> ( ARITHMETIC_EXPRESSION ) .
 
 I(72):
-布尔表达式 -> 算术表达式 比较运算符 算术表达式 .
-算术表达式 -> 算术表达式 . 算术运算符 算术表达式 
-算术运算符 -> . + 
-算术运算符 -> . - 
-算术运算符 -> . * 
-算术运算符 -> . / 
+BOOL_EXPRESSION -> ARITHMETIC_EXPRESSION COMPARISON_OPERATOR ARITHMETIC_EXPRESSION .
+ARITHMETIC_EXPRESSION -> ARITHMETIC_EXPRESSION . ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION 
+ARITHMETIC_OPERATOR -> . + 
+ARITHMETIC_OPERATOR -> . - 
+ARITHMETIC_OPERATOR -> . * 
+ARITHMETIC_OPERATOR -> . / 
 
 I(73):
-函数块 -> while ( 布尔表达式 ) { . 函数块 } 
-函数块 -> . 函数块 函数块 
-函数块 -> . 变量类型 id ; 
-函数块 -> . id = 算术表达式 ; 
-函数块 -> . while ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } else { 函数块 } 
-函数块 -> . return ; 
-函数块 -> . return 算术表达式 ; 
-变量类型 -> . int 
-变量类型 -> . float 
+FUNCTION_BLOCK -> while ( BOOL_EXPRESSION ) { . FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . FUNCTION_BLOCK FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . VARIABLE_TYPE id ; 
+FUNCTION_BLOCK -> . id = ARITHMETIC_EXPRESSION ; 
+FUNCTION_BLOCK -> . while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . return ; 
+FUNCTION_BLOCK -> . return ARITHMETIC_EXPRESSION ; 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(74):
-布尔表达式 -> 布尔表达式 && 布尔表达式 .
-布尔表达式 -> 布尔表达式 . && 布尔表达式 
-布尔表达式 -> 布尔表达式 . || 布尔表达式 
+BOOL_EXPRESSION -> BOOL_EXPRESSION && BOOL_EXPRESSION .
+BOOL_EXPRESSION -> BOOL_EXPRESSION . && BOOL_EXPRESSION 
+BOOL_EXPRESSION -> BOOL_EXPRESSION . || BOOL_EXPRESSION 
 
 I(75):
-布尔表达式 -> 布尔表达式 || 布尔表达式 .
-布尔表达式 -> 布尔表达式 . && 布尔表达式 
-布尔表达式 -> 布尔表达式 . || 布尔表达式 
+BOOL_EXPRESSION -> BOOL_EXPRESSION || BOOL_EXPRESSION .
+BOOL_EXPRESSION -> BOOL_EXPRESSION . && BOOL_EXPRESSION 
+BOOL_EXPRESSION -> BOOL_EXPRESSION . || BOOL_EXPRESSION 
 
 I(76):
-布尔表达式 -> ( 布尔表达式 ) .
+BOOL_EXPRESSION -> ( BOOL_EXPRESSION ) .
 
 I(77):
-函数块 -> if ( 布尔表达式 ) { . 函数块 } 
-函数块 -> if ( 布尔表达式 ) { . 函数块 } else { 函数块 } 
-函数块 -> . 函数块 函数块 
-函数块 -> . 变量类型 id ; 
-函数块 -> . id = 算术表达式 ; 
-函数块 -> . while ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } else { 函数块 } 
-函数块 -> . return ; 
-函数块 -> . return 算术表达式 ; 
-变量类型 -> . int 
-变量类型 -> . float 
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) { . FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) { . FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . FUNCTION_BLOCK FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . VARIABLE_TYPE id ; 
+FUNCTION_BLOCK -> . id = ARITHMETIC_EXPRESSION ; 
+FUNCTION_BLOCK -> . while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . return ; 
+FUNCTION_BLOCK -> . return ARITHMETIC_EXPRESSION ; 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(78):
-函数块 -> while ( 布尔表达式 ) { 函数块 . } 
-函数块 -> 函数块 . 函数块 
-函数块 -> . 函数块 函数块 
-函数块 -> . 变量类型 id ; 
-函数块 -> . id = 算术表达式 ; 
-函数块 -> . while ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } else { 函数块 } 
-函数块 -> . return ; 
-函数块 -> . return 算术表达式 ; 
-变量类型 -> . int 
-变量类型 -> . float 
+FUNCTION_BLOCK -> while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK . } 
+FUNCTION_BLOCK -> FUNCTION_BLOCK . FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . FUNCTION_BLOCK FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . VARIABLE_TYPE id ; 
+FUNCTION_BLOCK -> . id = ARITHMETIC_EXPRESSION ; 
+FUNCTION_BLOCK -> . while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . return ; 
+FUNCTION_BLOCK -> . return ARITHMETIC_EXPRESSION ; 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(79):
-函数块 -> if ( 布尔表达式 ) { 函数块 . } 
-函数块 -> if ( 布尔表达式 ) { 函数块 . } else { 函数块 } 
-函数块 -> 函数块 . 函数块 
-函数块 -> . 函数块 函数块 
-函数块 -> . 变量类型 id ; 
-函数块 -> . id = 算术表达式 ; 
-函数块 -> . while ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } else { 函数块 } 
-函数块 -> . return ; 
-函数块 -> . return 算术表达式 ; 
-变量类型 -> . int 
-变量类型 -> . float 
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK . } 
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK . } else { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> FUNCTION_BLOCK . FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . FUNCTION_BLOCK FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . VARIABLE_TYPE id ; 
+FUNCTION_BLOCK -> . id = ARITHMETIC_EXPRESSION ; 
+FUNCTION_BLOCK -> . while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . return ; 
+FUNCTION_BLOCK -> . return ARITHMETIC_EXPRESSION ; 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(80):
-函数块 -> while ( 布尔表达式 ) { 函数块 } .
+FUNCTION_BLOCK -> while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } .
 
 I(81):
-函数块 -> if ( 布尔表达式 ) { 函数块 } .
-函数块 -> if ( 布尔表达式 ) { 函数块 } . else { 函数块 } 
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } .
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } . else { FUNCTION_BLOCK } 
 
 I(82):
-函数块 -> if ( 布尔表达式 ) { 函数块 } else . { 函数块 } 
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else . { FUNCTION_BLOCK } 
 
 I(83):
-函数块 -> if ( 布尔表达式 ) { 函数块 } else { . 函数块 } 
-函数块 -> . 函数块 函数块 
-函数块 -> . 变量类型 id ; 
-函数块 -> . id = 算术表达式 ; 
-函数块 -> . while ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } else { 函数块 } 
-函数块 -> . return ; 
-函数块 -> . return 算术表达式 ; 
-变量类型 -> . int 
-变量类型 -> . float 
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { . FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . FUNCTION_BLOCK FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . VARIABLE_TYPE id ; 
+FUNCTION_BLOCK -> . id = ARITHMETIC_EXPRESSION ; 
+FUNCTION_BLOCK -> . while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . return ; 
+FUNCTION_BLOCK -> . return ARITHMETIC_EXPRESSION ; 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(84):
-函数块 -> if ( 布尔表达式 ) { 函数块 } else { 函数块 . } 
-函数块 -> 函数块 . 函数块 
-函数块 -> . 函数块 函数块 
-函数块 -> . 变量类型 id ; 
-函数块 -> . id = 算术表达式 ; 
-函数块 -> . while ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } 
-函数块 -> . if ( 布尔表达式 ) { 函数块 } else { 函数块 } 
-函数块 -> . return ; 
-函数块 -> . return 算术表达式 ; 
-变量类型 -> . int 
-变量类型 -> . float 
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK . } 
+FUNCTION_BLOCK -> FUNCTION_BLOCK . FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . FUNCTION_BLOCK FUNCTION_BLOCK 
+FUNCTION_BLOCK -> . VARIABLE_TYPE id ; 
+FUNCTION_BLOCK -> . id = ARITHMETIC_EXPRESSION ; 
+FUNCTION_BLOCK -> . while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } 
+FUNCTION_BLOCK -> . return ; 
+FUNCTION_BLOCK -> . return ARITHMETIC_EXPRESSION ; 
+VARIABLE_TYPE -> . int 
+VARIABLE_TYPE -> . float 
 
 I(85):
-函数块 -> if ( 布尔表达式 ) { 函数块 } else { 函数块 } .
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK } .
 

@@ -350,10 +350,6 @@ def get_LR0_collection(G):
     return C
 
 
-
-
-
-
 # 令每个项目集Ik的下标k作为分析器的状态
 # ACTION 表项和 GOTO表项可按如下方法构造：
 #   若项目A ->α • aβ属于 Ik 且 GO (Ik, a)= Ij, 期望字符a 为终结符，则置ACTION[k, a] =sj (j表示新状态Ij);
@@ -364,49 +360,8 @@ def get_LR0_collection(G):
 #       如果圆点在项目k最后且k不是S’ ->S，那么对所有终结符a，ACTION[k, a]=rj (j表示文法中第j个产生式)；
 #   若项目A ->α • Aβ属于 Ik，且GO (Ik, A)= Ij,期望字符 A为非终结符，则置GOTO(k, A)=j (j表示文法中第j个产生式);
 #       如果圆点在项目k最后且k是S’ ->S，则ACTION[k, #]为“acc”;
-
 # 分析表中凡不能用上述规则填入信息的空白格均置上“出错标志”
-# 输入文法G的拓广文法G'，获取LRO分析表
-def get_LRO_table(G):
-    # 先获取LR0项目集规范族
-    C = get_LR0_collection(G)
 
-    n = len(C)
-    action = [["" for i in range(len(G['T']) + 1)] for i in range(n)]
-    goto = [["" for i in range(len(G['V']))] for i in range(n)]
-    for k in range(n):
-        I = C[k]
-        for item in I:
-            # 圆点不在右部表达式的最右侧，即还不需要归约
-            if item.index < len(item.right):
-                character = item.right[item.index]
-                # 找出满足GOTO(I, character)=C[j]的j
-                for j in range(n):
-                    if set_equal(GO(G, I, character), C[j]):
-                        # 如果character是终结符
-                        if character in G['T']:
-                            # 在action表里添加状态转移以及当前符号压入栈的提示
-                            action[k][G['T'].index(character)] = "S" + str(j)
-                        # 如果是非终结符
-                        else:
-                            # 在goto表里添加状态转移提示
-                            goto[k][G['V'].index(character)] = str(j)
-                        break
-            # 圆点在右部表达式的最右侧，即需要归约
-            else:
-                # 如果该表达式是S'->S，则在action表里添加acc
-                if item.left == G['S'] + "'":
-                    action[k][len(action[k]) - 1] = "acc"
-                    continue
-                # 否则，找到P中对应的产生式序号
-                m = len(G['P'])
-                for j in range(1, m):
-                    if G['P'][j].left == item.left and G['P'][j].right == item.right:
-                        for a in range(len(G['T']) + 1):
-                            action[k][a] = "r" + str(j)
-    return action, goto
-
-# SLR(1)分析表是建立在 LR(0)分析表基础上的，因此首先需要完成 LR(0)分析表的前置条件，再加上 FOLLOW 集
 # 构造SLR(1)分析表的方法:
 # 1、把G扩广成G’
 # 2、对G’构造：得到LR(0)项目集规范族C；活前缀识别自动机的状态转换函数GO
@@ -543,8 +498,8 @@ def LR_parser(G, action, goto, tokens):
     ip = 0
     while True:
         print("", file=write)
-        print("状态栈: " + str(stack_state), file=write)
-        print("符号栈: " + str(stack_character), file=write)
+        print("State stack: " + str(stack_state), file=write)
+        print("Value stack: " + str(stack_character), file=write)
         if ip >= len(buffer):
             break
 
@@ -552,7 +507,7 @@ def LR_parser(G, action, goto, tokens):
         S = stack_state[len(stack_state)-1]
         a = buffer[ip]
 
-        print("输入缓冲区: ", end="", file=write)
+        print("Input buffer: ", end="", file=write)
         input = buffer[ip:]
         for c in input:
             print(c, end=" ", file=write)
@@ -560,17 +515,17 @@ def LR_parser(G, action, goto, tokens):
 
         # 获取SLR(1)分析表中对应的字符串
         string = action[S][a]
-        print("分析表内容: " + string, file=write)
-        print("当前动作: ", end="", file=write)
+        print("SLR(1) table: " + string, file=write)
+        print("action: ", end="", file=write)
         # 出错
         if string == '':
             print("SLR(1) parsing FAILED.")
-            print("分析出错", file=write)
+            print("Parsing failed.", file=write)
             return
         # 需要转移至状态i，并且把a压入栈中
         elif string[0] == 'S':
             i = int(string[1:])
-            print("移进状态%s，输入符号%s" % (str(i), a), file=write)
+            print("Shift state: %s，input character: %s" % (str(i), a), file=write)
             stack_character.append(a)
             stack_state.append(i)
 
@@ -581,7 +536,7 @@ def LR_parser(G, action, goto, tokens):
         elif string[0] == 'r':
             k = int(string[1:])
             n = len(G['P'][k].right)
-            print("按第%s个产生式归约: " % str(k) + str(G['P'][k].right) + " -> " + G['P'][k].left, end="", file=write)
+            print("Reduce with No.%s production: " % str(k) + str(G['P'][k].right) + " -> " + G['P'][k].left, end="", file=write)
             A = G['P'][k].left
 
             # 归约以后弹出n个符号
@@ -591,7 +546,7 @@ def LR_parser(G, action, goto, tokens):
             # 查询goto表，将新的状态压入状态栈
             S = stack_state[len(stack_state) - 1]
             stack_state.append(int(goto[S][A]))
-            print("，将状态%s压入栈中" % str(goto[S][A]), file=write)
+            print(", push state %s into state stack" % str(goto[S][A]), file=write)
             stack_character.append(A)
 
             # 结点栈弹出n个结点，并生成它们的父结点，再将父结点压入栈
@@ -605,7 +560,7 @@ def LR_parser(G, action, goto, tokens):
         # 分析成功
         elif string == "acc":
             print("Successfully finished SLR(1) parsing，syntactic parser finished work.")
-            print("分析成功", file=write)
+            print("Parsing succeeded.", file=write)
 
             filename = '8_Parse_Tree.txt'
             write = open(filename, 'w', encoding='UTF-8')

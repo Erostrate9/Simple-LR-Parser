@@ -1,54 +1,54 @@
 # 注：不支持全局变量定义，不支持函数嵌套定义，变量只能在函数内部定义，程序由地位相同的函数组成
 
 # 程序主体部分
-程序 -> 函数定义
-函数定义 -> 函数定义 函数定义
-函数定义 -> 变量类型 id ( ) { 函数块 }
-函数定义 -> 变量类型 id ( 传入参数 ) { 函数块 }
+PROGRAM -> DEFINE_FUNCTION
+DEFINE_FUNCTION -> DEFINE_FUNCTION DEFINE_FUNCTION
+DEFINE_FUNCTION -> VARIABLE_TYPE id ( ) { FUNCTION_BLOCK }
+DEFINE_FUNCTION -> VARIABLE_TYPE id ( INCOMING_PARAMETER ) { FUNCTION_BLOCK }
 
 # 参数列表部分
-传入参数 -> 变量类型 id
-传入参数 -> 变量类型 id , 传入参数
+INCOMING_PARAMETER -> VARIABLE_TYPE id
+INCOMING_PARAMETER -> VARIABLE_TYPE id , INCOMING_PARAMETER
 
-# 函数块部分（声明、赋值、循环、分支、返回）
-函数块 -> 函数块 函数块
-函数块 -> 变量类型 id ;
-函数块 -> id = 算术表达式 ;
-函数块 -> while ( 布尔表达式 ) { 函数块 }
-函数块 -> if ( 布尔表达式 ) { 函数块 }
-函数块 -> if ( 布尔表达式 ) { 函数块 } else { 函数块 }
-函数块 -> return ;
-函数块 -> return 算术表达式 ;
+# FUNCTION_BLOCK部分（声明、赋值、循环、分支、返回）
+FUNCTION_BLOCK -> FUNCTION_BLOCK FUNCTION_BLOCK
+FUNCTION_BLOCK -> VARIABLE_TYPE id ;
+FUNCTION_BLOCK -> id = ARITHMETIC_EXPRESSION ;
+FUNCTION_BLOCK -> while ( BOOL_EXPRESSION ) { FUNCTION_BLOCK }
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK }
+FUNCTION_BLOCK -> if ( BOOL_EXPRESSION ) { FUNCTION_BLOCK } else { FUNCTION_BLOCK }
+FUNCTION_BLOCK -> return ;
+FUNCTION_BLOCK -> return ARITHMETIC_EXPRESSION ;
 
 # 声明（不考虑指针和数组）
-变量类型 -> int
-变量类型 -> float
+VARIABLE_TYPE -> int
+VARIABLE_TYPE -> float
 
 # 表达式
-算术表达式 -> 算术表达式 算术运算符 算术表达式
-算术表达式 -> - 算术表达式
-算术表达式 -> ( 算术表达式 )
-算术表达式 -> id
-算术表达式 -> digit
+ARITHMETIC_EXPRESSION -> ARITHMETIC_EXPRESSION ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION
+ARITHMETIC_EXPRESSION -> - ARITHMETIC_EXPRESSION
+ARITHMETIC_EXPRESSION -> ( ARITHMETIC_EXPRESSION )
+ARITHMETIC_EXPRESSION -> id
+ARITHMETIC_EXPRESSION -> digit
 
-布尔表达式 -> 算术表达式 比较运算符 算术表达式
-布尔表达式 -> 布尔表达式 && 布尔表达式
-布尔表达式 -> 布尔表达式 || 布尔表达式
-布尔表达式 -> ! 布尔表达式
-布尔表达式 -> ( 布尔表达式 )
-布尔表达式 -> true
-布尔表达式 -> false
+BOOL_EXPRESSION -> ARITHMETIC_EXPRESSION COMPARISON_OPERATOR ARITHMETIC_EXPRESSION
+BOOL_EXPRESSION -> BOOL_EXPRESSION && BOOL_EXPRESSION
+BOOL_EXPRESSION -> BOOL_EXPRESSION || BOOL_EXPRESSION
+BOOL_EXPRESSION -> ! BOOL_EXPRESSION
+BOOL_EXPRESSION -> ( BOOL_EXPRESSION )
+BOOL_EXPRESSION -> true
+BOOL_EXPRESSION -> false
 
 # 运算符
-比较运算符 -> <
-比较运算符 -> >
-比较运算符 -> <=
-比较运算符 -> >=
-比较运算符 -> ==
-比较运算符 -> !=
+COMPARISON_OPERATOR -> <
+COMPARISON_OPERATOR -> >
+COMPARISON_OPERATOR -> <=
+COMPARISON_OPERATOR -> >=
+COMPARISON_OPERATOR -> ==
+COMPARISON_OPERATOR -> !=
 
-算术运算符 -> +
-算术运算符 -> -
-算术运算符 -> *
-算术运算符 -> /
+ARITHMETIC_OPERATOR -> +
+ARITHMETIC_OPERATOR -> -
+ARITHMETIC_OPERATOR -> *
+ARITHMETIC_OPERATOR -> /
 
